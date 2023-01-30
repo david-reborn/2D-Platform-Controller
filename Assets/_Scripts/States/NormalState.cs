@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +9,16 @@ namespace Myd.Platform.Demo
     {
         public NormalState(IPlayerContext context):base(EActionState.Normal, context)
         {
+        }
+
+        public override IEnumerator Coroutine()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool IsCoroutine()
+        {
+            return false;
         }
 
         public override void OnBegin()
@@ -22,6 +33,14 @@ namespace Myd.Platform.Demo
 
         public override EActionState Update(float deltaTime)
         {
+            //Dashing
+            if (this.ctx.CanDash)
+            {
+                //Speed += LiftBoost;
+                this.ctx.Dash();
+                return EActionState.Dash;
+            }
+
             //水平面上移动
             float mult = ctx.OnGround ? 1 : Constants.AirMult;
             //计算水平速度
@@ -67,7 +86,7 @@ namespace Myd.Platform.Demo
                 {
                     float maxY = this.ctx.MaxFall;//最大下落速度
                     //TODO Wall Slide
-                    float multY = (Math.Abs(speed.y) < Constants.HalfGravThreshold && (ctx.JumpChecked)) ? .5f : 1f;
+                    float multY = (Math.Abs(speed.y) < Constants.HalfGravThreshold && (Input.Jump.Checked())) ? .5f : 1f;
                     //空中的情况,需要计算Y轴速度
                     speed.y = Mathf.MoveTowards(speed.y, maxY, Constants.Gravity * multY * deltaTime);
                 }
@@ -75,7 +94,7 @@ namespace Myd.Platform.Demo
                 //处理跳跃
                 if (ctx.VarJumpTimer > 0)
                 {
-                    if (this.ctx.JumpChecked)
+                    if (Input.Jump.Checked())
                     {
                         //如果按住跳跃，则跳跃速度不受重力影响。
                         speed.y = Math.Max(speed.y, ctx.VarJumpSpeed);
@@ -86,7 +105,7 @@ namespace Myd.Platform.Demo
             }
             ctx.Speed = speed;
 
-            if (this.ctx.JumpPressed)
+            if (Input.Jump.Pressed())
             {
                 //土狼时间范围内,允许跳跃
                 if (this.ctx.JumpGraceTimer > 0)

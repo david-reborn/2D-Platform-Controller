@@ -27,6 +27,8 @@ namespace Myd.Platform.Demo
 
         private void OnDrawGizmos()
         {
+            if (controller == null)
+                return;
             Rect rect = new Rect(0, -0.25f, 0.8f, 1.1f);
             Gizmos.DrawLine(controller.Position + rect.position, controller.Position + rect.position + Vector2.right);
         }
