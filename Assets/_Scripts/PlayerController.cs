@@ -5,13 +5,14 @@ using UnityEngine;
 
 namespace Myd.Platform.Demo
 {
-    public struct Input
+    public struct Asix
     {
         public float moveX;
         public float MoveY;
     }
     public class PlayerController : IPlayerContext
     {
+        private const int MaxDashes = 1;    // 最大Dash次数
         private readonly int GroundMask;
 
         private readonly Rect normalHitbox = new Rect(0, -0.25f, 0.8f, 1.1f);
@@ -26,6 +27,9 @@ namespace Myd.Platform.Demo
         private float maxFall;
         private float fastMaxFall;
 
+        private float dashCooldownTimer;                //冲刺冷却时间计数器，为0时，可以再次冲刺
+        private float dashRefillCooldownTimer;          //
+        private int dashes;
         private float wallSpeedRetentionTimer; // If you hit a wall, start this timer. If coast is clear within this timer, retain h-speed
         private float wallSpeedRetained;
         private bool onGround;
@@ -36,14 +40,17 @@ namespace Myd.Platform.Demo
         {
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
             this.stateMachine.AddState(new NormalState(this));
-
+            this.stateMachine.AddState(new DashState(this));
             this.GroundMask = LayerMask.GetMask("Ground");
+
+            this.LastAim = Vector2.right;
         }
 
         public void Init()
         {
             //根据进入的方式,决定初始状态
-            this.stateMachine.SetState((int)EActionState.Normal);
+            this.stateMachine.State = (int)EActionState.Normal;
+            this.dashes = 1;
         }
 
         public void Update(float deltaTime)
@@ -66,6 +73,18 @@ namespace Myd.Platform.Demo
                     varJumpTimer -= deltaTime;
                 }
 
+                //Force Move X
+                //if (forceMoveXTimer > 0)
+                //{
+                //    forceMoveXTimer -= Engine.DeltaTime;
+                //    moveX = forceMoveX;
+                //}
+                //else
+                {
+                    //输入
+                    this.moveX = Math.Sign(UnityEngine.Input.GetAxisRaw("Horizontal"));
+                }
+
                 //撞墙以后的速度保持，Wall Speed Retention
                 if (wallSpeedRetentionTimer > 0)
                 {
@@ -80,10 +99,23 @@ namespace Myd.Platform.Demo
                     else
                         wallSpeedRetentionTimer -= deltaTime;
                 }
-            }
 
-            //输入
-            this.moveX = Math.Sign(UnityEngine.Input.GetAxisRaw("Horizontal"));
+                //更新冲刺冷却时间
+                {
+                    if (dashCooldownTimer > 0)
+                        dashCooldownTimer -= deltaTime;
+                    if (dashRefillCooldownTimer > 0)
+                    {
+                        dashRefillCooldownTimer -= deltaTime;
+                    }
+                    else if (onGround)
+                    {
+                        RefillDash();
+                    }
+                }
+                Vector2 facing = new Vector2(this.moveX, 0);
+                LastAim = facing;
+            }
 
             //落地设置土狼时间
             if (OnGround)
@@ -185,8 +217,26 @@ namespace Myd.Platform.Demo
             this.varJumpSpeed = Constants.JumpSpeed;
         }
 
+        public bool RefillDash()
+        {
+            if (this.dashes < MaxDashes)
+            {
+                this.dashes = MaxDashes;
+                return true;
+            }
+            else
+                return false;
+        }
 
         #region 实现IPlayerContext接口
+        public bool CanDash
+        {
+            get
+            {
+                return Input.Dash.Pressed() && dashCooldownTimer <= 0 && this.dashes > 0;
+            }
+        }
+
         public float WallSpeedRetentionTimer
         {
             get { return this.wallSpeedRetentionTimer; }
@@ -207,9 +257,6 @@ namespace Myd.Platform.Demo
         public object Holding => null;
 
         public bool OnGround => this.onGround;
-
-        public bool JumpPressed => UnityEngine.Input.GetKeyDown(KeyCode.Space);
-        public bool JumpChecked => UnityEngine.Input.GetKey(KeyCode.Space);
 
         public float JumpGraceTimer => jumpGraceTimer;
 
@@ -239,11 +286,23 @@ namespace Myd.Platform.Demo
             }
         }
 
-
         public int MoveX => moveX;
         public int MoveY => Math.Sign(UnityEngine.Input.GetAxisRaw("Vertical"));
 
         public float MaxFall { get => maxFall; set => maxFall = value; }
+        public float DashCooldownTimer { get => dashCooldownTimer; set => dashCooldownTimer = value; }
+        public Vector2 LastAim { get; set; }
+
+        public void Dash()
+        {
+            //wasDashB = Dashes == 2;
+            this.dashes = Math.Max(0, this.dashes - 1);
+            //Input.Dash.ConsumeBuffer();
+        }
+        public void SetState(int state)
+        {
+            this.stateMachine.State = state;
+        }
         #endregion
 
         private bool CollideCheck(Vector2 position)

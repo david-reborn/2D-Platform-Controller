@@ -11,16 +11,21 @@ namespace Myd.Platform.Demo
         Vector2 Speed { get; set; }
         System.Object Holding { get; }
         bool OnGround { get; }
-        bool JumpPressed { get; } //Jump键刚刚按下
-        bool JumpChecked { get; } //Jump键处于按下状态
         float JumpGraceTimer { get; }
 
         float VarJumpSpeed { get; }     
         float VarJumpTimer { get; set; }
         void Jump();
+        void Dash();
+        void SetState(int state);
 
-
+        Vector2 LastAim { get; set; }
         float MaxFall { get; set; }
         float WallSpeedRetentionTimer { get; set; }
+
+        bool CanDash { get; }
+        float DashCooldownTimer { get; set; }
+
+        
     }
 }

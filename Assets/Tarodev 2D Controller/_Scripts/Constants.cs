@@ -33,5 +33,18 @@ namespace Myd.Platform.Demo
 
         const float WallSpeedRetentionTime = .06f; //撞墙以后可以允许的保持速度的时间
 
+
+        #region Dash相关参数
+        const float DashSpeed = 24f;           //冲刺速度
+        const float EndDashSpeed = 16f;        //结束冲刺速度
+        const float EndDashUpMult = .75f;       //如果向上冲刺，阻力。
+        const float DashTime = .15f;            //冲刺时间
+        const float DashCooldown = .2f;         //冲刺冷却时间，
+        const float DashRefillCooldown = .1f;   //冲刺重新装填时间
+        const int DashHJumpThruNudge = 6;       //
+        const int DashCornerCorrection = 4;     //水平Dash时，遇到阻挡物的可纠正像素值
+        const int DashVFloorSnapDist = 3;       //DashAttacking下的地面吸附像素值
+        const float DashAttackTime = .3f;       //
+        #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,7 @@ namespace Myd.Platform.Demo
 
         protected BaseActionState(EActionState state, IPlayerContext context)
         {
+            this.state = state;
             this.ctx = context;
         }
 
@@ -28,24 +30,30 @@ namespace Myd.Platform.Demo
         //每一帧都执行的逻辑
         public abstract EActionState Update(float deltaTime);
 
+        public abstract IEnumerator Coroutine();
+
         public abstract void OnBegin();
 
         public abstract void OnEnd();
+
+        public abstract bool IsCoroutine();
     }
 
     /// <summary>
     /// 有限状态机
     /// </summary>
-    public class FiniteStateMachine<S> where S: BaseActionState
+    public class FiniteStateMachine<S> where S : BaseActionState
     {
         private S[] states;
 
         private int currState = -1;
         private int prevState = -1;
+        private Coroutine currentCoroutine;
 
         public FiniteStateMachine(int size)
         {
             this.states = new S[size];
+            this.currentCoroutine = new Coroutine(true);
         }
 
         public void AddState(S state)
@@ -54,25 +62,38 @@ namespace Myd.Platform.Demo
         }
 
         public void Update(float deltaTime)
-        {  
-            this.currState = (int)this.states[this.currState].Update(deltaTime);
+        {
+            State = (int)this.states[this.currState].Update(deltaTime);
+            if (this.currentCoroutine.Active)
+            {
+                this.currentCoroutine.Update(deltaTime);
+            }
         }
 
-        //改变状态
-        public void SetState(int nextState)
+        public int State
         {
-            if (this.currState == nextState)
-                return;
-
-            this.prevState = this.currState;
-            this.currState = nextState;
-            if (this.prevState != -1)
+            get
             {
-                this.states[this.prevState].OnEnd();
+                return this.currState;
             }
-            this.states[this.currState].OnBegin();
-
-            //TODO 处理协程
+            set
+            {
+                if (this.currState == value)
+                    return;
+                this.prevState = this.currState;
+                this.currState = value;
+                if (this.prevState != -1)
+                {
+                    this.states[this.prevState].OnEnd();
+                }
+                this.states[this.currState].OnBegin();
+                if (this.states[this.currState].IsCoroutine())
+                {
+                    this.currentCoroutine.Replace(this.states[this.currState].Coroutine());
+                    return;
+                }
+                this.currentCoroutine.Cancel();
+            }
         }
     }
 }
