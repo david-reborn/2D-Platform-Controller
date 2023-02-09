@@ -42,7 +42,7 @@ namespace Myd.Platform.Demo
                 //        return StPickup;
 
                 //Climbing
-                if (ctx.Speed.y >= 0 && Math.Sign(ctx.Speed.x) != -(int)ctx.Facing)
+                if (ctx.Speed.y <= 0 && Math.Sign(ctx.Speed.x) != -(int)ctx.Facing)
                 {
                     if (ctx.ClimbCheck((int)ctx.Facing))
                     {
@@ -78,6 +78,10 @@ namespace Myd.Platform.Demo
             //计算水平速度
             float max = ctx.Holding == null ? Constants.MaxRun : Constants.HoldingMaxRun;
             Vector2 speed = ctx.Speed;
+            if (this.ctx.MoveX != 0)
+            {
+                Debug.Log($"========{this.ctx.MoveX}");
+            }
             if (Math.Abs(speed.x) > max && Math.Sign(speed.x) == this.ctx.MoveX)
             {
                 //同方向加速

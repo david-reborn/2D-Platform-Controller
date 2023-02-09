@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Myd.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,8 +59,68 @@ namespace Myd.Platform.Demo
 
             //设置速度
             float target = 0;
+            bool trySlip = false;
+            if (ctx.ClimbNoMoveTimer <= 0)
+            {
+                if (false)//(ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * (int)Facing))  
+                {
+                    //trySlip = true;
+                }
+                else if (ctx.MoveY == 1)
+                {
+                    //往上爬
+                    target = Constants.ClimbUpSpeed;
+                    //Up Limit
+                    if (ctx.CollideCheck(ctx.Position + Vector2.up * 0.01f))// || (ClimbHopBlockedCheck() && SlipCheck(-1)))
+                    {
+                        Logging.Log($"========上部有障碍!!");
+                        ctx.Speed.y = Mathf.Min(ctx.Speed.y, 0);
+                        target = 0;
+                        trySlip = true;
+                    }
+                    //else if (SlipCheck())
+                    else if (false)
+                    {
+                        //Hopping
+                        //ClimbHop();
+                        return EActionState.Normal;
+                    }
+                }
+                else if (ctx.MoveY == -1)
+                {
+                    //往下爬
+                    target = Constants.ClimbDownSpeed;
+
+                    if (ctx.OnGround)
+                    {
+                        ctx.Speed.y = Mathf.Max(ctx.Speed.y, 0);    //落地时,Y轴速度>=0
+                        target = 0;
+                    }
+                    else
+                    {
+                        //TODO 创建粒子效果
+                        //CreateWallSlideParticles((int)Facing);
+                    }
+                }
+                else
+                {
+                    trySlip = true;
+                }
+            }
+            else
+            {
+                trySlip = true;
+            }
+
+            //TODO 滑行
+            //if (trySlip && SlipCheck())
+            //    target = ClimbSlipSpeed;
+
             ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, target, Constants.ClimbAccel * deltaTime);
 
+            //if (Input.MoveY.Value != 1 && Speed.Y > 0 && !CollideCheck<Solid>(Position + new Vector2((int)Facing, 1)))
+            //    Speed.Y = 0;
+            Logging.Log($"===ctx.MoveY:[{ctx.MoveY}]当前速度:{ctx.Speed}");
             return state;
         }
     }

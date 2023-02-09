@@ -56,9 +56,9 @@ namespace Myd.Platform.Demo
         public const int ClimbUpCheckDist = 2;         //向上攀爬检查像素值
         public const float ClimbNoMoveTime = .1f;
         public const float ClimbTiredThreshold = 20f;   //表现疲惫的阈值
-        public const float ClimbUpSpeed = -4.5f;        //上爬速度
-        public const float ClimbDownSpeed = 8f;       //下爬速度
-        public const float ClimbSlipSpeed = 3f;       //下滑速度
+        public const float ClimbUpSpeed = 4.5f;        //上爬速度
+        public const float ClimbDownSpeed = -8f;       //下爬速度
+        public const float ClimbSlipSpeed = -3f;       //下滑速度
         public const float ClimbAccel = 90f;          //下滑加速度
         public const float ClimbGrabYMult = .2f;       //攀爬时抓取导致的Y轴速度衰减
         public const float ClimbHopY = -12f;          //Hop的Y轴速度
