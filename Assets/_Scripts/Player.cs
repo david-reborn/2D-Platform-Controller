@@ -7,22 +7,28 @@ namespace Myd.Platform.Demo
     public class Player : MonoBehaviour
     {
         PlayerController controller;
+        [SerializeField]
+        private SpriteRenderer spriteRenderer;
         void Start()
         {
             controller = new PlayerController();
-
-            controller.Init();
-
-            controller.Position = this.transform.position;
+            controller.Init(this.transform.position);
         }
 
         void Update()
         {
             controller.Update(Time.deltaTime);
 
-            controller.Render();
+            Render();
+        }
 
+        private void Render()
+        {
+            Vector2 scale = this.transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * (int)controller.Facing;
+            this.transform.localScale = scale;
             this.transform.position = controller.Position;
+            this.spriteRenderer.transform.localScale = controller.Scale;
         }
 
         private void OnDrawGizmos()

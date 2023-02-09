@@ -7,6 +7,20 @@ using UnityEngine;
 
 namespace Myd.Platform.Demo
 {
+    public enum Facings
+    {
+        Right = 1,
+        Left = -1
+    }
+
+    public struct VirtualIntegerAxis
+    {
+
+    }
+    public struct VirtualJoystick
+    {
+        public Vector2 Value { get => new Vector2(UnityEngine.Input.GetAxisRaw("Horizontal"), UnityEngine.Input.GetAxisRaw("Vertical"));}
+    }
     public struct VisualButton
     {
         private KeyCode key;
@@ -30,7 +44,30 @@ namespace Myd.Platform.Demo
     {
         public static VisualButton Jump = new VisualButton(KeyCode.Space);
         public static VisualButton Dash = new VisualButton(KeyCode.K);
+        public static VisualButton Grab = new VisualButton(KeyCode.J);
+        public static VirtualJoystick Aim = new VirtualJoystick();
+        public static Vector2 LastAim;
+
+        //根据当前朝向,决定移动方向.
+        public static Vector2 GetAimVector(Facings defaultFacing = Facings.Right)
+        {
+            Vector2 value = Input.Aim.Value;
+            //TODO 考虑辅助模式
+
+            //TODO 考虑摇杆
+            if (value == Vector2.zero)
+            {
+                Input.LastAim = Vector2.right * ((int)defaultFacing);
+            }
+            else
+            {
+                Input.LastAim = value;
+            }
+            return Input.LastAim;
+        }
     }
+
+
 
 
 }

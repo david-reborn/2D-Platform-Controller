@@ -10,14 +10,18 @@ namespace Myd.Platform.Demo
         public float moveX;
         public float MoveY;
     }
-    public class PlayerController : IPlayerContext
+    public class PlayerController
     {
         private const int MaxDashes = 1;    // 最大Dash次数
         private readonly int GroundMask;
 
         private readonly Rect normalHitbox = new Rect(0, -0.25f, 0.8f, 1.1f);
-        private readonly Rect ductHitBox = new Rect(0, -0.3f, 0.8f, 0.6f);
-        Vector2 position;
+        private readonly Rect duckHitbox = new Rect(0, -0.5f, 0.8f, 0.6f);
+        private readonly Rect normalHurtbox = new Rect(0f, -0.15f, 0.8f, 0.9f);
+        private readonly Rect duckHurtbox = new Rect(8f, 4f, 0.8f, 0.4f);
+        private Rect hitbox;
+        private Rect hurtbox;
+        Vector2 scale;
         Vector2 size;
         Vector2 speed;   //移动向量
         float jumpGraceTimer;
@@ -44,13 +48,15 @@ namespace Myd.Platform.Demo
             this.GroundMask = LayerMask.GetMask("Ground");
 
             this.LastAim = Vector2.right;
+            this.Facing = Facings.Right;
         }
 
-        public void Init()
+        public void Init(Vector2 position)
         {
             //根据进入的方式,决定初始状态
             this.stateMachine.State = (int)EActionState.Normal;
             this.dashes = 1;
+            this.Position = position;
         }
 
         public void Update(float deltaTime)
@@ -113,8 +119,14 @@ namespace Myd.Platform.Demo
                         RefillDash();
                     }
                 }
-                Vector2 facing = new Vector2(this.moveX, 0);
-                LastAim = facing;
+
+                //Facing
+                //if (moveX != 0 && InControl && StateMachine.State != StClimb && StateMachine.State != StPickup && StateMachine.State != StRedDash && StateMachine.State != StHitSquash)
+                if (moveX != 0)
+                {
+                    Facing = (Facings)moveX;
+                }
+                LastAim = Input.GetAimVector(Facing);
             }
 
             //落地设置土狼时间
@@ -142,10 +154,21 @@ namespace Myd.Platform.Demo
             //    MoveH(Speed.X * Engine.DeltaTime, onCollideH);
             //if (StateMachine.State != StDreamDash && StateMachine.State != StAttract)
             //    MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
+
+            //更新
+            UpdateSprite(deltaTime);
         }
 
         public void Render()
         {
+        }
+
+        private void UpdateSprite(float deltaTime)
+        {
+            Vector2 tempScale = Scale;
+            tempScale.x = Mathf.MoveTowards(tempScale.x, 1f, 1.75f * deltaTime);
+            tempScale.y = Mathf.MoveTowards(tempScale.y, 1f, 1.75f * deltaTime);
+            Scale = tempScale;
         }
 
         private void UpdatePositionX(float distX)
@@ -154,14 +177,13 @@ namespace Myd.Platform.Demo
                 return;
             //目标位置
             Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
-            Vector2 targetPosition = this.position;
+            Vector2 targetPosition = this.Position;
 
-            Vector2 origion = this.position + normalHitbox.position + Vector2.up * 0.01f;
+            Vector2 origion = this.Position + normalHitbox.position + Vector2.up * 0.01f;
 
             RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distX) + 0.01f, GroundMask);
             if (hit && hit.normal == -direct)
             {
-                Debug.Log("================UpdatePositionX:Hit");
                 //如果发生碰撞,则移动距离
                 targetPosition += direct * (hit.distance - 0.01f);
                 //Speed retention
@@ -176,13 +198,13 @@ namespace Myd.Platform.Demo
             {
                 targetPosition += Vector2.right * distX;
             }
-            this.position = targetPosition;
+            this.Position = targetPosition;
         }
         private void UpdatePositionY(float distY)
         {
-            Vector2 targetPosition = this.position;
+            Vector2 targetPosition = this.Position;
             Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
-            Vector2 origion = this.position + normalHitbox.position;
+            Vector2 origion = this.Position + normalHitbox.position;
             RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distY), GroundMask);
             if (hit && hit.normal == -direct)
             {
@@ -193,13 +215,13 @@ namespace Myd.Platform.Demo
             {
                 targetPosition += Vector2.up * distY;
             }
-            this.position = targetPosition;
+            this.Position = targetPosition;
         }
 
         //针对横向,进行碰撞检测.如果发生碰撞,
         private bool CollideY()
         {
-            Vector2 origion = this.position + Vector2.up * normalHitbox.position.y;
+            Vector2 origion = this.Position + Vector2.up * normalHitbox.position.y;
             RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, Vector2.down, 0.00001f, GroundMask);
             if (hit && hit.normal == Vector2.up)
             {
@@ -215,6 +237,8 @@ namespace Myd.Platform.Demo
             this.varJumpTimer = Constants.VarJumpTime;
             this.speed.y = Constants.JumpSpeed;
             this.varJumpSpeed = Constants.JumpSpeed;
+
+            Scale = new Vector2(.6f, 1.4f);
         }
 
         public bool RefillDash()
@@ -242,17 +266,7 @@ namespace Myd.Platform.Demo
             get { return this.wallSpeedRetentionTimer; }
             set { this.wallSpeedRetentionTimer = value; }
         }
-        public Vector2 Speed
-        {
-            get
-            {
-                return this.speed;
-            }
-            set
-            {
-                this.speed = value;
-            }
-        }
+        public Vector2 Speed;
 
         public object Holding => null;
 
@@ -260,21 +274,13 @@ namespace Myd.Platform.Demo
 
         public float JumpGraceTimer => jumpGraceTimer;
 
-        public Vector2 Position
-        {
-            get
-            {
-                return position;
-            }
-            set
-            {
-                this.position = value;
-            }
-        }
+        public Vector2 Position { get; private set; }
+        public Vector2 Scale { get; private set; }
 
-        float IPlayerContext.VarJumpSpeed => this.varJumpSpeed;
+        public float ClimbNoMoveTimer { get; set; }
+        public float VarJumpSpeed => this.varJumpSpeed;
 
-        float IPlayerContext.VarJumpTimer
+        public float VarJumpTimer
         {
             get
             {
@@ -292,7 +298,7 @@ namespace Myd.Platform.Demo
         public float MaxFall { get => maxFall; set => maxFall = value; }
         public float DashCooldownTimer { get => dashCooldownTimer; set => dashCooldownTimer = value; }
         public Vector2 LastAim { get; set; }
-
+        public Facings Facing { get; set; }  //当前朝向
         public void Dash()
         {
             //wasDashB = Dashes == 2;
@@ -305,9 +311,71 @@ namespace Myd.Platform.Demo
         }
         #endregion
 
+
+        public void WallJump(int dir)
+        {
+
+        }
+
+        public void ClimbJump()
+        {
+
+        }
+
+        public bool Ducking
+        {
+            get
+            {
+                return this.hitbox == this.duckHitbox || this.hitbox == this.duckHurtbox;
+            }
+            set
+            {
+                if (value)
+                {
+                    this.hitbox = this.duckHitbox;
+                    this.hurtbox = this.duckHurtbox;
+                    return;
+                }
+                this.hurtbox = this.normalHurtbox;
+            }
+        }
+
+        public bool IsTired
+        {
+            get
+            {
+                return false;
+            }
+            set
+            {
+
+            }
+        }
+
+        #region Physics
         private bool CollideCheck(Vector2 position)
         {
             return Physics2D.OverlapBox(position, normalHitbox.size, 0, GroundMask);
         }
+
+        public bool ClimbCheck(int dir, int yAdd = 0)
+        {
+            //检查在关卡范围内
+            //if (!this.ClimbBoundsCheck(dir))
+            //    return false;
+
+            //且前面两个单元没有ClimbBlock
+            //if (ClimbBlocker.Check(base.Scene, this, this.Position + Vector2.UnitY * (float)yAdd + Vector2.UnitX * 2f * (float)this.Facing))
+            //    return false;
+            
+            //TODO 获取当前的碰撞体
+            if(Physics2D.OverlapBox(this.Position, normalHitbox.size, 0, GroundMask))
+            {
+
+            }
+
+            return true;
+        }
+        #endregion
     }
 }

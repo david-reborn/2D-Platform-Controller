@@ -12,7 +12,7 @@ namespace Myd.Platform.Demo
     {
         private Vector2 DashDir;
         private Vector2 beforeDashSpeed; 
-        public DashState(IPlayerContext context) : base(EActionState.Dash, context)
+        public DashState(PlayerController context) : base(EActionState.Dash, context)
         {
         }
 
@@ -43,7 +43,6 @@ namespace Myd.Platform.Demo
         public override IEnumerator Coroutine()
         {
             yield return null;
-
             //
             var dir = ctx.LastAim;
             var newSpeed = dir * Constants.DashSpeed;
@@ -51,7 +50,7 @@ namespace Myd.Platform.Demo
                 newSpeed.x = beforeDashSpeed.x;
             ctx.Speed = newSpeed;
 
-            DashDir = dir;
+            DashDir = dir; 
 
             yield return Constants.DashTime;
 

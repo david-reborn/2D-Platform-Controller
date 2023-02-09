@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Myd.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,15 +12,16 @@ namespace Myd.Platform.Demo
     {
         Normal,
         Dash,
+        Climb,
         Size,
     }
 
     public abstract class BaseActionState
     {
         protected EActionState state;
-        protected IPlayerContext ctx;
+        protected PlayerController ctx;
 
-        protected BaseActionState(EActionState state, IPlayerContext context)
+        protected BaseActionState(EActionState state, PlayerController context)
         {
             this.state = state;
             this.ctx = context;
@@ -82,10 +84,13 @@ namespace Myd.Platform.Demo
                     return;
                 this.prevState = this.currState;
                 this.currState = value;
+                Logging.Log($"====Enter State[{(EActionState)this.currState}],Leave State[{(EActionState)this.prevState}] ");
                 if (this.prevState != -1)
                 {
+                    Logging.Log($"====State[{(EActionState)this.prevState}] OnEnd ");
                     this.states[this.prevState].OnEnd();
                 }
+                Logging.Log($"====State[{(EActionState)this.currState}] OnBegin ");
                 this.states[this.currState].OnBegin();
                 if (this.states[this.currState].IsCoroutine())
                 {

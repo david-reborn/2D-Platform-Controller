@@ -26,6 +26,10 @@ namespace Myd.Platform.Demo
         bool CanDash { get; }
         float DashCooldownTimer { get; set; }
 
-        
+        Facings Facing { get; set; }
+
+        void WallJump(int dir);
+
+        void ClimbJump();
     }
 }

@@ -7,7 +7,7 @@ namespace Myd.Platform.Demo
 {
     public class NormalState : BaseActionState
     {
-        public NormalState(IPlayerContext context):base(EActionState.Normal, context)
+        public NormalState(PlayerController context):base(EActionState.Normal, context)
         {
         }
 
@@ -33,6 +33,38 @@ namespace Myd.Platform.Demo
 
         public override EActionState Update(float deltaTime)
         {
+            //Climb
+            if (Input.Grab.Checked() && !ctx.IsTired && !ctx.Ducking)
+            {
+                //Grabbing Holdables
+                //foreach (Holdable hold in Scene.Tracker.GetComponents<Holdable>())
+                //    if (hold.Check(this) && Pickup(hold))
+                //        return StPickup;
+
+                //Climbing
+                if (ctx.Speed.y >= 0 && Math.Sign(ctx.Speed.x) != -(int)ctx.Facing)
+                {
+                    if (ctx.ClimbCheck((int)ctx.Facing))
+                    {
+                        ctx.Ducking = false;
+                        return EActionState.Climb;
+                    }
+                    //TODO 考虑风场
+                    //if (Input.MoveY < 1 && level.Wind.Y <= 0)
+                    //{
+                    //    for (int i = 1; i <= ClimbUpCheckDist; i++)
+                    //    {
+                    //        if (!CollideCheck<Solid>(Position + Vector2.UnitY * -i) && ClimbCheck((int)Facing, -i))
+                    //        {
+                    //            MoveVExact(-i);
+                    //            Ducking = false;
+                    //            return StClimb;
+                    //        }
+                    //    }
+                    //}
+                }
+            }
+
             //Dashing
             if (this.ctx.CanDash)
             {
@@ -117,4 +149,6 @@ namespace Myd.Platform.Demo
             return state;
         }
     }
+
+
 }

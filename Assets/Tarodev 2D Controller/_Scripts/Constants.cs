@@ -20,7 +20,7 @@ namespace Myd.Platform.Demo
         //Hold情况下的最大移动速度
         const float HoldingMaxRun = 7f;
         //空气阻力
-        const float AirMult = 0.065f;
+        const float AirMult = 0.65f;
         //移动加速度
         const float RunAccel = 100f;
         //移动减速度
@@ -45,6 +45,27 @@ namespace Myd.Platform.Demo
         const int DashCornerCorrection = 4;     //水平Dash时，遇到阻挡物的可纠正像素值
         const int DashVFloorSnapDist = 3;       //DashAttacking下的地面吸附像素值
         const float DashAttackTime = .3f;       //
+        #endregion
+
+        #region Climb参数
+        public const float ClimbMaxStamina = 110;       //最大耐力
+        public const float ClimbUpCost = 100 / 2.2f;   //向上爬得耐力消耗
+        public const float ClimbStillCost = 100 / 10f; //爬着不动耐力消耗
+        public const float ClimbJumpCost = 110 / 4f;   //爬着跳跃耐力消耗
+        public const int ClimbCheckDist = 2;           //攀爬检查像素值
+        public const int ClimbUpCheckDist = 2;         //向上攀爬检查像素值
+        public const float ClimbNoMoveTime = .1f;
+        public const float ClimbTiredThreshold = 20f;   //表现疲惫的阈值
+        public const float ClimbUpSpeed = -4.5f;        //上爬速度
+        public const float ClimbDownSpeed = 8f;       //下爬速度
+        public const float ClimbSlipSpeed = 3f;       //下滑速度
+        public const float ClimbAccel = 90f;          //下滑加速度
+        public const float ClimbGrabYMult = .2f;       //攀爬时抓取导致的Y轴速度衰减
+        public const float ClimbHopY = -12f;          //Hop的Y轴速度
+        public const float ClimbHopX = 10f;           //Hop的X轴速度
+        public const float ClimbHopForceTime = .2f;    //Hop时间
+        public const float ClimbJumpBoostTime = .2f;   //WallBoost时间
+        public const float ClimbHopNoWindTime = .3f;   //Wind情况下,Hop会无风0.3秒
         #endregion
     }
 }
