@@ -11,6 +11,7 @@ namespace Myd.Platform.Demo
     /// </summary>
     public partial class PlayerController
     {
+        const float DEVIATION = 0.02f;  //碰撞检测误差
 
         private readonly Rect normalHitbox = new Rect(0, -0.25f, 0.8f, 1.1f);
         private readonly Rect duckHitbox = new Rect(0, -0.5f, 0.8f, 0.6f);
@@ -24,6 +25,7 @@ namespace Myd.Platform.Demo
             return Physics2D.OverlapBox(position, normalHitbox.size, 0, GroundMask);
         }
 
+        //攀爬检查
         public bool ClimbCheck(int dir, int yAdd = 0)
         {
             //检查在关卡范围内
@@ -35,7 +37,7 @@ namespace Myd.Platform.Demo
             //    return false;
 
             //获取当前的碰撞体
-            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * 2f * dir * 0.01f, normalHitbox.size, 0, GroundMask))
+            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * dir * DEVIATION , normalHitbox.size, 0, GroundMask))
             {
                 return true;
             }
@@ -54,11 +56,11 @@ namespace Myd.Platform.Demo
 
             Vector2 origion = this.Position + normalHitbox.position;
 
-            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distX) + 0.01f, GroundMask);
+            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
             if (hit)
             {
                 //如果发生碰撞,则移动距离
-                targetPosition += direct * (hit.distance - 0.01f);
+                targetPosition += direct * (hit.distance - DEVIATION);
                 //Speed retention
                 //if (wallSpeedRetentionTimer <= 0)
                 //{
@@ -79,11 +81,11 @@ namespace Myd.Platform.Demo
             Vector2 targetPosition = this.Position;
             Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
             Vector2 origion = this.Position + normalHitbox.position;
-            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distY) + 0.01f, GroundMask);
+            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
             if (hit && hit.normal == -direct)
             {
                 //如果发生碰撞,则移动距离
-                targetPosition += direct * (hit.distance - 0.01f);
+                targetPosition += direct * (hit.distance - DEVIATION);
             }
             else
             {
