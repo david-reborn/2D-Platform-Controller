@@ -9,6 +9,8 @@ namespace Myd.Platform.Demo
         PlayerController controller;
         [SerializeField]
         private SpriteRenderer spriteRenderer;
+        [SerializeField]
+        private ParticleSystem vfxMoveDust;
         void Start()
         {
             controller = new PlayerController();
@@ -18,9 +20,10 @@ namespace Myd.Platform.Demo
         void Update()
         {
             controller.Update(Time.deltaTime);
-
             Render();
         }
+
+        private bool lastFrameOnGround = false;
 
         private void Render()
         {
@@ -29,6 +32,14 @@ namespace Myd.Platform.Demo
             this.transform.localScale = scale;
             this.transform.position = controller.Position;
             this.spriteRenderer.transform.localScale = controller.Scale;
+
+            if (!lastFrameOnGround && this.controller.OnGround)
+            {
+                this.vfxMoveDust.Play();
+            }
+            if (lastFrameOnGround && !this.controller.OnGround)
+                this.vfxMoveDust.Stop();
+            lastFrameOnGround = this.controller.OnGround;
         }
 
         private void OnDrawGizmos()

@@ -27,7 +27,7 @@ namespace Myd.Platform.Demo
 
         private float dashCooldownTimer;                //冲刺冷却时间计数器，为0时，可以再次冲刺
         private float dashRefillCooldownTimer;          //
-        private int dashes;
+        public int dashes;
         private float wallSpeedRetentionTimer; // If you hit a wall, start this timer. If coast is clear within this timer, retain h-speed
         private float wallSpeedRetained;
 
@@ -223,6 +223,7 @@ namespace Myd.Platform.Demo
             if (this.dashes < MaxDashes)
             {
                 this.dashes = MaxDashes;
+                Debug.Log("[Dash]===========RefillDash");
                 return true;
             }
             else
@@ -277,11 +278,12 @@ namespace Myd.Platform.Demo
         public float DashCooldownTimer { get => dashCooldownTimer; set => dashCooldownTimer = value; }
         public Vector2 LastAim { get; set; }
         public Facings Facing { get; set; }  //当前朝向
-        public void Dash()
+        public EActionState Dash()
         {
             //wasDashB = Dashes == 2;
             this.dashes = Math.Max(0, this.dashes - 1);
             //Input.Dash.ConsumeBuffer();
+            return EActionState.Dash;
         }
         public void SetState(int state)
         {

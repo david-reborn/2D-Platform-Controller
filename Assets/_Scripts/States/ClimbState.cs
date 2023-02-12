@@ -57,7 +57,7 @@ namespace Myd.Platform.Demo
             }
             if (ctx.CanDash)
             {
-                return EActionState.Dash;
+                return this.ctx.Dash();
             }
             //放开抓取键,则回到Normal状态
             if (!Input.Grab.Checked())

@@ -70,8 +70,7 @@ namespace Myd.Platform.Demo
             if (this.ctx.CanDash)
             {
                 //Speed += LiftBoost;
-                this.ctx.Dash();
-                return EActionState.Dash;
+                return this.ctx.Dash();
             }
 
             //水平面上移动
@@ -126,7 +125,6 @@ namespace Myd.Platform.Demo
                     //Wall Slide
                     if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && Input.Grab.Checked())) && ctx.MoveY != 1)
                     {
-                        Logging.Log($"===Wall Slide:{ctx.Facing.ToString()}===[{ctx.MoveX == (int)ctx.Facing}]");
                         //判断是否向下做Wall滑行
                         if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck())
                         {
