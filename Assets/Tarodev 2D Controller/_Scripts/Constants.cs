@@ -28,11 +28,22 @@ namespace Myd.Platform.Demo
         //
         const float JumpSpeed = 10.5f;  //最大跳跃速度
         const float VarJumpTime = 0.2f; //跳跃持续时间(跳起时,会持续响应跳跃按键[VarJumpTime]秒,影响跳跃的最高高度);
-
+        const float JumpHBoost = 4f;
         const float JumpGraceTime = 0.1f;//土狼时间
 
-        const float WallSpeedRetentionTime = .06f; //撞墙以后可以允许的保持速度的时间
+        #region WallJump
+        public const float WallJumpCheckDist = 0.3f;
+        public const float WallJumpForceTime = .16f; //墙上跳跃强制时间
+        const float WallJumpHSpeed = MaxRun + JumpHBoost;
 
+        #endregion
+        #region WallSlide
+        public const float WallSpeedRetentionTime = .06f; //撞墙以后可以允许的保持速度的时间
+        public const float WallSlideTime = 1.2f; //墙壁滑行时间
+        public const float WallSlideStartMax = -2f;
+        
+        
+        #endregion
 
         #region Dash相关参数
         const float DashSpeed = 24f;           //冲刺速度
@@ -66,6 +77,9 @@ namespace Myd.Platform.Demo
         public const float ClimbHopForceTime = .2f;    //Hop时间
         public const float ClimbJumpBoostTime = .2f;   //WallBoost时间
         public const float ClimbHopNoWindTime = .3f;   //Wind情况下,Hop会无风0.3秒
+
         #endregion
+
+       
     }
 }

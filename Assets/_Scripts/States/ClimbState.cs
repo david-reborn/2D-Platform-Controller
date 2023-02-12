@@ -31,6 +31,7 @@ namespace Myd.Platform.Demo
             tempSpeed.x = 0;
             tempSpeed.y *= Constants.ClimbGrabYMult;
             //TODO 其他参数
+            ctx.WallSlideTimer = Constants.WallSlideTime;
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
             //TODO 表现
@@ -54,74 +55,128 @@ namespace Myd.Platform.Demo
 
                 return EActionState.Normal;
             }
-            //检测前面的墙面是否存在
-
-
-            //设置速度
-            float target = 0;
-            bool trySlip = false;
-            if (ctx.ClimbNoMoveTimer <= 0)
+            if (ctx.CanDash)
             {
-                if (false)//(ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * (int)Facing))  
-                {
-                    //trySlip = true;
-                }
-                else if (ctx.MoveY == 1)
-                {
-                    //往上爬
-                    target = Constants.ClimbUpSpeed;
-                    //Up Limit
-                    if (ctx.CollideCheck(ctx.Position + Vector2.up * 0.01f))// || (ClimbHopBlockedCheck() && SlipCheck(-1)))
-                    {
-                        Logging.Log($"========上部有障碍!!");
-                        ctx.Speed.y = Mathf.Min(ctx.Speed.y, 0);
-                        target = 0;
-                        trySlip = true;
-                    }
-                    //else if (SlipCheck())
-                    else if (false)
-                    {
-                        //Hopping
-                        //ClimbHop();
-                        return EActionState.Normal;
-                    }
-                }
-                else if (ctx.MoveY == -1)
-                {
-                    //往下爬
-                    target = Constants.ClimbDownSpeed;
+                return EActionState.Dash;
+            }
+            //放开抓取键,则回到Normal状态
+            if (!Input.Grab.Checked())
+            {
+                //Speed += LiftBoost;
+                //Play(Sfxs.char_mad_grab_letgo);
+                return EActionState.Normal;
+            }
 
-                    if (ctx.OnGround)
+            //检测前面的墙面是否存在
+            if (!ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing))
+            {
+                //Climbed over ledge?
+                if (ctx.Speed.y < 0)
+                {
+                    //if (wallBoosting)
+                    //{
+                    //    Speed += LiftBoost;
+                    //    Play(Sfxs.char_mad_grab_letgo);
+                    //}
+                    //else
+                    ClimbHop(); //自动翻越墙面
+                }
+
+                return EActionState.Normal;
+            }
+
+            {
+                //Climbing
+                float target = 0;
+                bool trySlip = false;
+                if (ctx.ClimbNoMoveTimer <= 0)
+                {
+                    if (false)//(ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * (int)Facing))  
                     {
-                        ctx.Speed.y = Mathf.Max(ctx.Speed.y, 0);    //落地时,Y轴速度>=0
-                        target = 0;
+                        //trySlip = true;
+                    }
+                    else if (ctx.MoveY == 1)
+                    {
+                        //往上爬
+                        target = Constants.ClimbUpSpeed;
+                        //向上攀爬的移动限制,顶上有碰撞或者SlipCheck
+                        if (ctx.CollideCheck(ctx.Position, Vector2.up) || (ctx.ClimbHopBlockedCheck() && ctx.SlipCheck(0.1f)))
+                        {
+                            ctx.Speed.y = Mathf.Min(ctx.Speed.y, 0);
+                            target = 0;
+                            trySlip = true;
+                        }
+                        else if (ctx.SlipCheck())
+                        {
+                            //Hopping
+                            ClimbHop();
+                            return EActionState.Normal;
+                        }
+                    }
+                    else if (ctx.MoveY == -1)
+                    {
+                        //往下爬
+                        target = Constants.ClimbDownSpeed;
+
+                        if (ctx.OnGround)
+                        {
+                            ctx.Speed.y = Mathf.Max(ctx.Speed.y, 0);    //落地时,Y轴速度>=0
+                            target = 0;
+                        }
+                        else
+                        {
+                            //TODO 创建粒子效果
+                            //CreateWallSlideParticles((int)Facing);
+                        }
                     }
                     else
                     {
-                        //TODO 创建粒子效果
-                        //CreateWallSlideParticles((int)Facing);
+                        trySlip = true;
                     }
                 }
                 else
                 {
                     trySlip = true;
                 }
+
+                //滑行
+                if (trySlip && ctx.SlipCheck())
+                {
+                    target = Constants.ClimbSlipSpeed;
+                }
+                ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, target, Constants.ClimbAccel * deltaTime);
+            }
+            //TrySlip导致的下滑在碰到底部的时候,停止下滑
+            if (ctx.MoveY != 1 && ctx.Speed.y < 0 && !ctx.CollideCheck(ctx.Position, new Vector2((int)ctx.Facing, -1)))
+            {
+                ctx.Speed.y = 0;
+            }
+            //TODO Stamina
+            return state;
+        }
+
+        private void ClimbHop()
+        {
+            ctx.ClimbHopSolid = ctx.CollideClimbHop((int)ctx.Facing);
+            //playFootstepOnLand = 0.5f;
+
+            Logging.Log($"===ClimbHop:{ctx.ClimbHopSolid==true}");
+            if (ctx.ClimbHopSolid)
+            {
+                //climbHopSolidPosition = climbHopSolid.Position;
+                ctx.HopWaitX = (int)ctx.Facing;
+                ctx.HopWaitXSpeed = (int)ctx.Facing * Constants.ClimbHopX;
             }
             else
             {
-                trySlip = true;
+                ctx.HopWaitX = 0;
+                ctx.Speed.x = (int)ctx.Facing * Constants.ClimbHopX;
             }
 
-            //TODO 滑行
-            //if (trySlip && SlipCheck())
-            //    target = ClimbSlipSpeed;
-
-            ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, target, Constants.ClimbAccel * deltaTime);
-
-            //if (Input.MoveY.Value != 1 && Speed.Y > 0 && !CollideCheck<Solid>(Position + new Vector2((int)Facing, 1)))
-            //    Speed.Y = 0;
-            Logging.Log($"===ctx.MoveY:[{ctx.MoveY}]当前速度:{ctx.Speed}");
-            return state;
+            ctx.Speed.y = Math.Min(ctx.Speed.y, Constants.ClimbHopY);
+            ctx.ForceMoveX = 0;
+            ctx.ForceMoveXTimer = Constants.ClimbHopForceTime;
+            //fastJump = false;
         }
     }
 }

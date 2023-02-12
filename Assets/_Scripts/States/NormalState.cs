@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Myd.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -74,25 +75,26 @@ namespace Myd.Platform.Demo
             }
 
             //水平面上移动
-            float mult = ctx.OnGround ? 1 : Constants.AirMult;
-            //计算水平速度
-            float max = ctx.Holding == null ? Constants.MaxRun : Constants.HoldingMaxRun;
-            Vector2 speed = ctx.Speed;
-            if (this.ctx.MoveX != 0)
+            if (ctx.Ducking && ctx.OnGround)
             {
-                Debug.Log($"========{this.ctx.MoveX}");
-            }
-            if (Math.Abs(speed.x) > max && Math.Sign(speed.x) == this.ctx.MoveX)
-            {
-                //同方向加速
-                speed.x = Mathf.MoveTowards(speed.x, max * this.ctx.MoveX, Constants.RunReduce * mult * Time.deltaTime);
+
             }
             else
             {
-                //反方向减速
-                speed.x = Mathf.MoveTowards(speed.x, max * this.ctx.MoveX, Constants.RunAccel * mult * Time.deltaTime);
+                float mult = ctx.OnGround ? 1 : Constants.AirMult;
+                //计算水平速度
+                float max = ctx.Holding == null ? Constants.MaxRun : Constants.HoldingMaxRun;
+                if (Math.Abs(ctx.Speed.x) > max && Math.Sign(ctx.Speed.x) == this.ctx.MoveX)
+                {
+                    //同方向加速
+                    ctx.Speed.x = Mathf.MoveTowards(ctx.Speed.x, max * this.ctx.MoveX, Constants.RunReduce * mult * Time.deltaTime);
+                }
+                else
+                {
+                    //反方向减速
+                    ctx.Speed.x = Mathf.MoveTowards(ctx.Speed.x, max * this.ctx.MoveX, Constants.RunAccel * mult * Time.deltaTime);
+                }
             }
-
             //计算竖直速度
             {
                 //计算最大下落速度
@@ -120,11 +122,35 @@ namespace Myd.Platform.Demo
 
                 if (!ctx.OnGround)
                 {
-                    float maxY = this.ctx.MaxFall;//最大下落速度
-                    //TODO Wall Slide
-                    float multY = (Math.Abs(speed.y) < Constants.HalfGravThreshold && (Input.Jump.Checked())) ? .5f : 1f;
+                    float max = this.ctx.MaxFall;//最大下落速度
+                    //Wall Slide
+                    if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && Input.Grab.Checked())) && ctx.MoveY != 1)
+                    {
+                        Logging.Log($"===Wall Slide:{ctx.Facing.ToString()}===[{ctx.MoveX == (int)ctx.Facing}]");
+                        //判断是否向下做Wall滑行
+                        if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck())
+                        {
+                            ctx.Ducking = false;
+                            ctx.WallSlideDir = (int)ctx.Facing;
+                        }
+
+                        if (ctx.WallSlideDir != 0)
+                        {
+                            //if (ctx.WallSlideTimer > Constants.WallSlideTime * 0.5f && ClimbBlocker.Check(level, this, Position + Vector2.UnitX * wallSlideDir))
+                            //    ctx.WallSlideTimer = Constants.WallSlideTime * .5f;
+
+                            max = Mathf.Lerp(ctx.MaxFall, Constants.WallSlideStartMax, ctx.WallSlideTimer / Constants.WallSlideTime);
+                            if ((ctx.WallSlideTimer / Constants.WallSlideTime) > .65f)
+                            {
+                                //TODO 播放特效
+                                //CreateWallSlideParticles(wallSlideDir);
+                            }
+                        }
+                    }
+
+                    float mult = (Math.Abs(ctx.Speed.y) < Constants.HalfGravThreshold && (Input.Jump.Checked())) ? .5f : 1f;
                     //空中的情况,需要计算Y轴速度
-                    speed.y = Mathf.MoveTowards(speed.y, maxY, Constants.Gravity * multY * deltaTime);
+                    ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, max, Constants.Gravity * mult * deltaTime);
                 }
 
                 //处理跳跃
@@ -133,13 +159,12 @@ namespace Myd.Platform.Demo
                     if (Input.Jump.Checked())
                     {
                         //如果按住跳跃，则跳跃速度不受重力影响。
-                        speed.y = Math.Max(speed.y, ctx.VarJumpSpeed);
+                        ctx.Speed.y = Math.Max(ctx.Speed.y, ctx.VarJumpSpeed);
                     }
                     else
                         ctx.VarJumpTimer = 0;
                 }
             }
-            ctx.Speed = speed;
 
             if (Input.Jump.Pressed())
             {
@@ -147,6 +172,26 @@ namespace Myd.Platform.Demo
                 if (this.ctx.JumpGraceTimer > 0)
                 {
                     this.ctx.Jump();
+                }else if (ctx.CanUnDuck())
+                {
+                    if (ctx.WallJumpCheck(1))
+                    {
+                        if (ctx.Facing == Facings.Right && Input.Grab.Checked())// && Stamina > 0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * WallJumpCheckDist))
+                            ctx.ClimbJump();
+                        //else if (DashAttacking && DashDir.X == 0 && DashDir.Y == -1)
+                        //    SuperWallJump(-1);
+                        else
+                            ctx.WallJump(-1);
+                    }
+                    //else if (ctx.WallJumpCheck(-1))
+                    //{
+                    //    if (Facing == Facings.Left && Input.Grab.Check && Stamina > 0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * -WallJumpCheckDist))
+                    //        ClimbJump();
+                    //    else if (DashAttacking && DashDir.X == 0 && DashDir.Y == -1)
+                    //        SuperWallJump(1);
+                    //    else
+                    //        WallJump(1);
+                    //}
                 }
             }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Myd.Common;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,9 +21,15 @@ namespace Myd.Platform.Demo
 
         private Rect hitbox;
 
+        //碰撞检测
+        public bool CollideCheck(Vector2 position, Vector2 dir, float dist = 0)
+        {
+            return Physics2D.OverlapBox(position + dir * (dist + DEVIATION), normalHitbox.size, 0, GroundMask);
+        }
+
         public bool CollideCheck(Vector2 position)
         {
-            return Physics2D.OverlapBox(position, normalHitbox.size, 0, GroundMask);
+            return Physics2D.OverlapPoint(position, GroundMask);
         }
 
         //攀爬检查
@@ -41,8 +48,7 @@ namespace Myd.Platform.Demo
             {
                 return true;
             }
-
-            return true;
+            return false;
         }
 
         //根据碰撞调整X轴上的最终移动距离
@@ -97,13 +103,48 @@ namespace Myd.Platform.Demo
         //针对横向,进行碰撞检测.如果发生碰撞,
         private bool CheckGround()
         {
-            //Vector2 origion = this.Position + normalHitbox.position;
-            //RaycastHit2D hit = Physics2D.Over(origion, normalHitbox.size, 0, Vector2.down, 0.01f, GroundMask);
-            //if (hit && hit.normal == Vector2.up)
+            Vector2 origion = this.Position + normalHitbox.position;
+            Collider2D hit = Physics2D.OverlapBox(origion + Vector2.down * DEVIATION, normalHitbox.size, 0, GroundMask);
+            if (hit)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        //根据整个关卡的边缘框进行检测,确保人物在关卡的框内.
+        public bool ClimbBoundsCheck(int dir)
+        {
+            return true;
+            //return base.Left + (float)(dir * 2) >= (float)this.level.Bounds.Left && base.Right + (float)(dir * 2) < (float)this.level.Bounds.Right;
+        }
+
+        //墙壁上跳检测
+        public bool WallJumpCheck(int dir)
+        {
+            return ClimbBoundsCheck(dir) && this.CollideCheck(Position, Vector2.right * dir, Constants.WallJumpCheckDist);
+        }
+
+        public RaycastHit2D ClimbHopSolid { get; set; }
+        public RaycastHit2D CollideClimbHop(int dir)
+        {
+            Vector2 origion = this.Position + normalHitbox.position;
+            RaycastHit2D hit = Physics2D.BoxCast(Position, normalHitbox.size, 0, Vector2.right * dir, DEVIATION, GroundMask);
+            return hit;
+            //if (hit && hit.normal.x == -dir)
             //{
-            //    return true;
+
             //}
-            //return false;
+        }
+
+        public bool SlipCheck(float addY = 0)
+        {
+            Vector2 origion = this.Position + normalHitbox.position + Vector2.up * (0.25f + addY);
+            return !Physics2D.OverlapBox(origion + Vector2.right * (int)this.Facing * DEVIATION, new Vector2(0.8f, 0.5f), 0, GroundMask );
+        }
+
+        public bool ClimbHopBlockedCheck()
+        {
             return true;
         }
     }

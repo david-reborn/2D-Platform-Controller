@@ -30,7 +30,17 @@ namespace Myd.Platform.Demo
         private int dashes;
         private float wallSpeedRetentionTimer; // If you hit a wall, start this timer. If coast is clear within this timer, retain h-speed
         private float wallSpeedRetained;
+
+        public float WallSlideTimer { get; set; } = Constants.WallSlideTime;
+        public int WallSlideDir { get; set; }
+
         private bool onGround;
+
+        public int ForceMoveX;
+        public float ForceMoveXTimer;
+
+        public int HopWaitX;   // If you climb hop onto a moving solid, snap to beside it until you get above it
+        public float HopWaitXSpeed;
 
         private FiniteStateMachine<BaseActionState> stateMachine;
 
@@ -58,14 +68,31 @@ namespace Myd.Platform.Demo
         {
             //更新变量状态
             {
+                //Get ground
                 if (Speed.y <= 0)
                 {
-                    //碰撞检测地面
-                    this.onGround = CheckGround();
+                    this.onGround = CheckGround();//碰撞检测地面
                 }
                 else
                 {
                     this.onGround = false;
+                }
+                //TODO Highest Air Y
+                //TODO Flashing
+                //Wall Slide
+                if (this.WallSlideDir != 0)
+                {
+                    this.WallSlideTimer = Math.Max(this.WallSlideTimer - deltaTime, 0);
+                    this.WallSlideDir = 0;
+                }
+
+                //TODO Wall Boost
+                //After Dash
+                if (this.onGround && this.stateMachine.State != (int)EActionState.Climb)
+                {
+                    //AutoJump = false;
+                    //Stamina = ClimbMaxStamina;
+                    this.WallSlideTimer = Constants.WallSlideTime;
                 }
 
                 //Var Jump
@@ -91,7 +118,7 @@ namespace Myd.Platform.Demo
                 {
                     if (Math.Sign(Speed.x) == -Math.Sign(wallSpeedRetained))
                         wallSpeedRetentionTimer = 0;
-                    else if (!CollideCheck(Position + Vector2.right * Math.Sign(wallSpeedRetained) * 0.00001f))
+                    else if (!CollideCheck(Position, Vector2.right * Math.Sign(wallSpeedRetained)))
                     {
                         Debug.Log($"====UseWallSpeed:{wallSpeedRetained}");
                         Speed.x = wallSpeedRetained;
@@ -99,6 +126,18 @@ namespace Myd.Platform.Demo
                     }
                     else
                         wallSpeedRetentionTimer -= deltaTime;
+                }
+
+                //Hop Wait X
+                if (this.HopWaitX != 0)
+                {
+                    if (Math.Sign(Speed.x) == -HopWaitX || Speed.y > 0)
+                        this.HopWaitX = 0;
+                    else if (!CollideCheck(Position, Vector2.right * this.HopWaitX))
+                    {
+                        Speed.x = this.HopWaitXSpeed;
+                        this.HopWaitX = 0;
+                    }
                 }
 
                 //更新冲刺冷却时间
@@ -117,7 +156,7 @@ namespace Myd.Platform.Demo
 
                 //Facing
                 //if (moveX != 0 && InControl && StateMachine.State != StClimb && StateMachine.State != StPickup && StateMachine.State != StRedDash && StateMachine.State != StHitSquash)
-                if (moveX != 0)
+                if (moveX != 0 && this.stateMachine.State != (int)EActionState.Climb)
                 {
                     Facing = (Facings)moveX;
                 }
@@ -143,7 +182,7 @@ namespace Myd.Platform.Demo
 
             //更新位置
             UpdateCollideX(Speed.x * deltaTime);
-            UpdatePositionY(Speed.y * deltaTime);
+            UpdateCollideY(Speed.y * deltaTime);
             //Physics
             //if (StateMachine.State != StDreamDash && StateMachine.State != StAttract)
             //    MoveH(Speed.X * Engine.DeltaTime, onCollideH);
@@ -166,29 +205,12 @@ namespace Myd.Platform.Demo
             Scale = tempScale;
         }
 
-        
-        private void UpdatePositionY(float distY)
-        {
-            Vector2 targetPosition = this.Position;
-            Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
-            Vector2 origion = this.Position + normalHitbox.position;
-            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distY), GroundMask);
-            if (hit && hit.normal == -direct)
-            {
-                //如果发生碰撞,则移动距离
-                targetPosition += direct * (hit.distance);
-            }
-            else
-            {
-                targetPosition += Vector2.up * distY;
-            }
-            this.Position = targetPosition;
-        }
-
         //处理跳跃
         public void Jump()
         {
             this.jumpGraceTimer = 0;
+            this.WallSlideTimer = Constants.WallSlideTime;
+
             this.varJumpTimer = Constants.VarJumpTime;
             this.Speed.y = Constants.JumpSpeed;
             this.varJumpSpeed = Constants.JumpSpeed;
@@ -270,12 +292,40 @@ namespace Myd.Platform.Demo
 
         public void WallJump(int dir)
         {
+            Ducking = false;
+            jumpGraceTimer = 0;
+            varJumpTimer = Constants.VarJumpTime;
+            //dashAttackTimer = 0;
+            WallSlideTimer = Constants.WallSlideTime;
+            //WallBoostTimer = 0;
+            if (moveX != 0)
+            {
+                this.ForceMoveX = dir;
+                this.ForceMoveXTimer = Constants.WallJumpForceTime;
+            }
 
+            //TODO 考虑电梯对速度的加成
+            Speed.x = Constants.WallJumpHSpeed * dir;
+            Speed.y = Constants.JumpSpeed;
+            //Speed += LiftBoost;
+            varJumpSpeed = Speed.y;
         }
 
         public void ClimbJump()
         {
+            if (!onGround)
+            {
+                //Stamina -= ClimbJumpCost;
 
+                //sweatSprite.Play("jump", true);
+                //Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
+            }
+            Jump();
+            if (moveX == 0)
+            {
+                //this.WallBoostDir = -(int)Facing;
+                //this.wallBoostTimer = ClimbJumpBoostTime;
+            }
         }
 
         public bool Ducking
@@ -305,5 +355,7 @@ namespace Myd.Platform.Demo
 
             }
         }
+
+        public bool CanUnDuck() => true;
     }
 }
