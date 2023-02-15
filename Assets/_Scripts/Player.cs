@@ -13,7 +13,7 @@ namespace Myd.Platform.Demo
         private ParticleSystem vfxMoveDust;
         void Start()
         {
-            controller = new PlayerController();
+            controller = new PlayerController(spriteRenderer);
             controller.Init(this.transform.position);
         }
 

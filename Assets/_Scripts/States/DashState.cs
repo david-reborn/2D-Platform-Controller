@@ -24,6 +24,7 @@ namespace Myd.Platform.Demo
             beforeDashSpeed = ctx.Speed;
             ctx.Speed = Vector2.zero;
             DashDir = Vector2.zero;
+            ctx.DashTrailTimer = 0;
         }
 
         public override void OnEnd()
@@ -38,6 +39,12 @@ namespace Myd.Platform.Demo
             //Super Jump
             //Wall Super Jump
             //Wall Jump
+            if (ctx.DashTrailTimer > 0)
+            {
+                ctx.DashTrailTimer -= deltaTime;
+                if (ctx.DashTrailTimer <= 0)
+                    CreateTrail();
+            }
 
             return state;
         }
@@ -52,16 +59,24 @@ namespace Myd.Platform.Demo
                 newSpeed.x = beforeDashSpeed.x;
             ctx.Speed = newSpeed;
 
-            DashDir = dir; 
+            DashDir = dir;
+
+            CreateTrail();
+            ctx.DashTrailTimer = .08f;
 
             yield return Constants.DashTime;
-
+            CreateTrail();
             this.ctx.SetState((int)EActionState.Normal);
         }
 
         public override bool IsCoroutine()
         {
             return true;
+        }
+
+        private void CreateTrail()
+        {
+            SceneEffectManager.instance.Add(ctx, Color.white);
         }
     }
 }

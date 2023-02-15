@@ -15,7 +15,6 @@ namespace Myd.Platform.Demo
         private const int MaxDashes = 1;    // 最大Dash次数
         private readonly int GroundMask;
 
-
         Vector2 scale;
         Vector2 size;
         float jumpGraceTimer;
@@ -44,8 +43,12 @@ namespace Myd.Platform.Demo
 
         private FiniteStateMachine<BaseActionState> stateMachine;
 
-        public PlayerController()
+        public SpriteRenderer Renderer { get; set; }
+        public PlayerController(SpriteRenderer renderer)
         {
+            //TODO 临时方案
+            this.Renderer = renderer;
+
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
             this.stateMachine.AddState(new NormalState(this));
             this.stateMachine.AddState(new DashState(this));
