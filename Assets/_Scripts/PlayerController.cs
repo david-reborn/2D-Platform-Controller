@@ -218,7 +218,7 @@ namespace Myd.Platform.Demo
             this.Speed.y = Constants.JumpSpeed;
             this.varJumpSpeed = Constants.JumpSpeed;
 
-            Scale = new Vector2(.6f, 1.4f);
+            this.Scale = new Vector2(.6f, 1.4f);
         }
 
         public bool RefillDash()
