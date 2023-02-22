@@ -337,14 +337,18 @@ namespace Myd.Platform.Demo
         {
             get
             {
-                return this.hitbox == this.duckHitbox || this.hitbox == this.duckHurtbox;
+                return this.collider == this.duckHitbox || this.collider == this.duckHurtbox;
             }
             set
             {
                 if (value)
                 {
-                    this.hitbox = this.duckHitbox;
+                    this.collider = this.duckHitbox;
                     return;
+                }
+                else
+                {
+                    this.collider = this.normalHitbox;
                 }
             }
         }
@@ -361,6 +365,19 @@ namespace Myd.Platform.Demo
             }
         }
 
-        public bool CanUnDuck() => true;
+        //检测当前是否可以站立
+        public bool CanUnDuck
+        {
+            get
+            {
+                if (!Ducking)
+                    return true;
+                Rect lastCollider = this.collider;
+                this.collider = normalHitbox;
+                bool hit = CollideCheck(this.Position, Vector2.zero);
+                this.collider = lastCollider;
+                return hit;
+            }
+        }
     }
 }

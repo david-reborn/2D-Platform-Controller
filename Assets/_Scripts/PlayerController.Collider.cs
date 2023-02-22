@@ -19,12 +19,12 @@ namespace Myd.Platform.Demo
         private readonly Rect normalHurtbox = new Rect(0f, -0.15f, 0.8f, 0.9f);
         private readonly Rect duckHurtbox = new Rect(8f, 4f, 0.8f, 0.4f);
 
-        private Rect hitbox;
 
+        private Rect collider;
         //碰撞检测
         public bool CollideCheck(Vector2 position, Vector2 dir, float dist = 0)
         {
-            return Physics2D.OverlapBox(position + dir * (dist + DEVIATION), normalHitbox.size, 0, GroundMask);
+            return Physics2D.OverlapBox(position + dir * (dist + DEVIATION), collider.size, 0, GroundMask);
         }
 
         public bool CollideCheck(Vector2 position)
@@ -44,7 +44,7 @@ namespace Myd.Platform.Demo
             //    return false;
 
             //获取当前的碰撞体
-            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * dir * DEVIATION , normalHitbox.size, 0, GroundMask))
+            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * dir * DEVIATION , collider.size, 0, GroundMask))
             {
                 return true;
             }
@@ -60,9 +60,9 @@ namespace Myd.Platform.Demo
             Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
             Vector2 targetPosition = this.Position;
 
-            Vector2 origion = this.Position + normalHitbox.position;
+            Vector2 origion = this.Position + collider.position;
 
-            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
+            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
             if (hit)
             {
                 //如果发生碰撞,则移动距离
@@ -86,8 +86,8 @@ namespace Myd.Platform.Demo
         {
             Vector2 targetPosition = this.Position;
             Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
-            Vector2 origion = this.Position + normalHitbox.position;
-            RaycastHit2D hit = Physics2D.BoxCast(origion, normalHitbox.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
+            Vector2 origion = this.Position + collider.position;
+            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
             if (hit && hit.normal == -direct)
             {
                 //如果发生碰撞,则移动距离
@@ -103,8 +103,8 @@ namespace Myd.Platform.Demo
         //针对横向,进行碰撞检测.如果发生碰撞,
         private bool CheckGround()
         {
-            Vector2 origion = this.Position + normalHitbox.position;
-            Collider2D hit = Physics2D.OverlapBox(origion + Vector2.down * DEVIATION, normalHitbox.size, 0, GroundMask);
+            Vector2 origion = this.Position + collider.position;
+            Collider2D hit = Physics2D.OverlapBox(origion + Vector2.down * DEVIATION, collider.size, 0, GroundMask);
             if (hit)
             {
                 return true;
@@ -128,8 +128,8 @@ namespace Myd.Platform.Demo
         public RaycastHit2D ClimbHopSolid { get; set; }
         public RaycastHit2D CollideClimbHop(int dir)
         {
-            Vector2 origion = this.Position + normalHitbox.position;
-            RaycastHit2D hit = Physics2D.BoxCast(Position, normalHitbox.size, 0, Vector2.right * dir, DEVIATION, GroundMask);
+            Vector2 origion = this.Position + collider.position;
+            RaycastHit2D hit = Physics2D.BoxCast(Position, collider.size, 0, Vector2.right * dir, DEVIATION, GroundMask);
             return hit;
             //if (hit && hit.normal.x == -dir)
             //{
@@ -139,7 +139,7 @@ namespace Myd.Platform.Demo
 
         public bool SlipCheck(float addY = 0)
         {
-            Vector2 origion = this.Position + normalHitbox.position + Vector2.up * (0.25f + addY);
+            Vector2 origion = this.Position + collider.position + Vector2.up * (0.25f + addY);
             return !Physics2D.OverlapBox(origion + Vector2.right * (int)this.Facing * DEVIATION, new Vector2(0.8f, 0.5f), 0, GroundMask );
         }
 
