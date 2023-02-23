@@ -73,10 +73,32 @@ namespace Myd.Platform.Demo
                 return this.ctx.Dash();
             }
 
-            //水平面上移动
+            //Ducking
+            if (ctx.Ducking)
+            {
+                if (ctx.OnGround && ctx.MoveY != -1)
+                {
+                    if (ctx.CanUnDuck)
+                    {
+                        ctx.Ducking = false;
+                        ctx.Scale = new Vector2(.8f, 1.2f);
+                    }
+                    else if (ctx.Speed.x == 0)
+                    {
+                        //根据角落位置，进行挤出操作
+                    }
+                }
+            }
+            else if (ctx.OnGround && ctx.MoveY == -1 && ctx.Speed.y <= 0)
+            {
+                ctx.Ducking = true;
+                ctx.Scale = new Vector2(1.4f, .6f);
+            }
+
+            //水平面上移动,计算阻力
             if (ctx.Ducking && ctx.OnGround)
             {
-
+                ctx.Speed.x = Mathf.MoveTowards(ctx.Speed.x, 0, Constants.DuckFriction * Time.deltaTime);
             }
             else
             {
@@ -126,7 +148,7 @@ namespace Myd.Platform.Demo
                     if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && Input.Grab.Checked())) && ctx.MoveY != 1)
                     {
                         //判断是否向下做Wall滑行
-                        if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck())
+                        if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck)
                         {
                             ctx.Ducking = false;
                             ctx.WallSlideDir = (int)ctx.Facing;
@@ -170,7 +192,7 @@ namespace Myd.Platform.Demo
                 if (this.ctx.JumpGraceTimer > 0)
                 {
                     this.ctx.Jump();
-                }else if (ctx.CanUnDuck())
+                }else if (ctx.CanUnDuck)
                 {
                     if (ctx.WallJumpCheck(1))
                     {

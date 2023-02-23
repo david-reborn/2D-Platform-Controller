@@ -35,8 +35,8 @@ namespace Myd.Platform.Demo
 
         private bool onGround;
 
-        public int ForceMoveX;
-        public float ForceMoveXTimer;
+        public int ForceMoveX { get; set; }
+        public float ForceMoveXTimer { get; set; }
 
         public int HopWaitX;   // If you climb hop onto a moving solid, snap to beside it until you get above it
         public float HopWaitXSpeed;
@@ -65,6 +65,7 @@ namespace Myd.Platform.Demo
             this.stateMachine.State = (int)EActionState.Normal;
             this.dashes = 1;
             this.Position = position;
+            this.collider = normalHitbox;
         }
 
         public void Update(float deltaTime)
@@ -105,12 +106,12 @@ namespace Myd.Platform.Demo
                 }
 
                 //Force Move X
-                //if (forceMoveXTimer > 0)
-                //{
-                //    forceMoveXTimer -= Engine.DeltaTime;
-                //    moveX = forceMoveX;
-                //}
-                //else
+                if (ForceMoveXTimer > 0)
+                {
+                    ForceMoveXTimer -= deltaTime;
+                    this.moveX = ForceMoveX;
+                }
+                else
                 {
                     //输入
                     this.moveX = Math.Sign(UnityEngine.Input.GetAxisRaw("Horizontal"));
@@ -134,7 +135,7 @@ namespace Myd.Platform.Demo
                 //Hop Wait X
                 if (this.HopWaitX != 0)
                 {
-                    if (Math.Sign(Speed.x) == -HopWaitX || Speed.y > 0)
+                    if (Math.Sign(Speed.x) == -HopWaitX || Speed.y < 0)
                         this.HopWaitX = 0;
                     else if (!CollideCheck(Position, Vector2.right * this.HopWaitX))
                     {
@@ -200,14 +201,6 @@ namespace Myd.Platform.Demo
         {
         }
 
-        private void UpdateSprite(float deltaTime)
-        {
-            Vector2 tempScale = Scale;
-            tempScale.x = Mathf.MoveTowards(tempScale.x, 1f, 1.75f * deltaTime);
-            tempScale.y = Mathf.MoveTowards(tempScale.y, 1f, 1.75f * deltaTime);
-            Scale = tempScale;
-        }
-
         //处理跳跃
         public void Jump()
         {
@@ -256,9 +249,9 @@ namespace Myd.Platform.Demo
         public float JumpGraceTimer => jumpGraceTimer;
 
         public Vector2 Position { get; private set; }
-        public Vector2 Scale { get; private set; }
+        public Vector2 Scale { get; set; }
 
-        //表示进入爬墙状态有0.1秒时间,不发生下落
+        //表示进入爬墙状态有0.1秒时间,不发生移动，为了让玩家看清发生了爬墙的动作
         public float ClimbNoMoveTimer { get; set; }
         public float VarJumpSpeed => this.varJumpSpeed;
 
@@ -344,11 +337,13 @@ namespace Myd.Platform.Demo
                 if (value)
                 {
                     this.collider = this.duckHitbox;
+                    this.CurrSpriteScale = DUCK_SPRITE_SCALE;
                     return;
                 }
                 else
                 {
                     this.collider = this.normalHitbox;
+                    this.CurrSpriteScale = NORMAL_SPRITE_SCALE;
                 }
             }
         }
@@ -374,9 +369,9 @@ namespace Myd.Platform.Demo
                     return true;
                 Rect lastCollider = this.collider;
                 this.collider = normalHitbox;
-                bool hit = CollideCheck(this.Position, Vector2.zero);
+                bool noCollide = !CollideCheck(this.Position, Vector2.zero);
                 this.collider = lastCollider;
-                return hit;
+                return noCollide;
             }
         }
     }

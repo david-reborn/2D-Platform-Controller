@@ -46,8 +46,16 @@ namespace Myd.Platform.Demo
         {
             if (controller == null)
                 return;
-            Rect rect = new Rect(0, -0.25f, 0.8f, 1.1f);
-            Gizmos.DrawLine(controller.Position + rect.position, controller.Position + rect.position + Vector2.right);
+            //Rect rect = new Rect(0, -0.25f, 0.8f, 1.1f);
+            //Gizmos.DrawLine(controller.Position + rect.position, controller.Position + rect.position + Vector2.right);
+
+            controller.Draw(EGizmoDrawType.SlipCheck);
         }
+    }
+
+    //测试用的绘制接口
+    public enum EGizmoDrawType
+    {
+        SlipCheck,
     }
 }

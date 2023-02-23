@@ -12,6 +12,7 @@ namespace Myd.Platform.Demo
     /// </summary>
     public partial class PlayerController
     {
+        const float STEP = 0.1f;  //碰撞检测步长，对POINT检测用
         const float DEVIATION = 0.02f;  //碰撞检测误差
 
         private readonly Rect normalHitbox = new Rect(0, -0.25f, 0.8f, 1.1f);
@@ -21,13 +22,15 @@ namespace Myd.Platform.Demo
 
 
         private Rect collider;
+
         //碰撞检测
         public bool CollideCheck(Vector2 position, Vector2 dir, float dist = 0)
         {
-            return Physics2D.OverlapBox(position + dir * (dist + DEVIATION), collider.size, 0, GroundMask);
+            Vector2 origion = this.Position + collider.position;
+            return Physics2D.OverlapBox(origion + dir * (dist + DEVIATION), collider.size, 0, GroundMask);
         }
 
-        public bool CollideCheck(Vector2 position)
+        public bool OverlapPoint(Vector2 position)
         {
             return Physics2D.OverlapPoint(position, GroundMask);
         }
@@ -139,13 +142,25 @@ namespace Myd.Platform.Demo
 
         public bool SlipCheck(float addY = 0)
         {
-            Vector2 origion = this.Position + collider.position + Vector2.up * (0.25f + addY);
-            return !Physics2D.OverlapBox(origion + Vector2.right * (int)this.Facing * DEVIATION, new Vector2(0.8f, 0.5f), 0, GroundMask );
+            int direct = Facing == Facings.Right ? 1 : -1;
+            Vector2 origin = this.Position + collider.position + Vector2.up * collider.size.y / 2f + Vector2.right * direct * (collider.size.x / 2f + STEP);
+            Vector2 point1 = origin + Vector2.up * (-0.4f + addY);
+
+            if(Physics2D.OverlapPoint(point1, GroundMask))
+            {
+                return false;
+            }
+            Vector2 point2 = origin + Vector2.up * (0.4f + addY);
+            if (Physics2D.OverlapPoint(point2, GroundMask))
+            {
+                return false;
+            }
+            return true;
         }
 
         public bool ClimbHopBlockedCheck()
         {
-            return true;
+            return false;
         }
     }
 }

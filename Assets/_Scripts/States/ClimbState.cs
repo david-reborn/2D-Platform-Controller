@@ -100,12 +100,21 @@ namespace Myd.Platform.Demo
                         //往上爬
                         target = Constants.ClimbUpSpeed;
                         //向上攀爬的移动限制,顶上有碰撞或者SlipCheck
-                        if (ctx.CollideCheck(ctx.Position, Vector2.up) || (ctx.ClimbHopBlockedCheck() && ctx.SlipCheck(0.1f)))
+                        if (ctx.CollideCheck(ctx.Position, Vector2.up))
                         {
+                            Debug.Log("=======ClimbSlip_Type1");
                             ctx.Speed.y = Mathf.Min(ctx.Speed.y, 0);
                             target = 0;
                             trySlip = true;
                         }
+                        //如果在上面0.6米处存在障碍，且前上方0.1米处没有阻碍，依然不允许向上
+                        else if (ctx.ClimbHopBlockedCheck() && ctx.SlipCheck(0.1f)){
+                            Debug.Log("=======ClimbSlip_Type2");
+                            ctx.Speed.y = Mathf.Min(ctx.Speed.y, 0);
+                            target = 0;
+                            trySlip = true;
+                        }
+                        //如果前上方没有阻碍, 则进行ClimbHop
                         else if (ctx.SlipCheck())
                         {
                             //Hopping
@@ -142,6 +151,7 @@ namespace Myd.Platform.Demo
                 //滑行
                 if (trySlip && ctx.SlipCheck())
                 {
+                    Debug.Log("=======ClimbSlip_Type4");
                     target = Constants.ClimbSlipSpeed;
                 }
                 ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, target, Constants.ClimbAccel * deltaTime);
@@ -157,26 +167,34 @@ namespace Myd.Platform.Demo
 
         private void ClimbHop()
         {
-            ctx.ClimbHopSolid = ctx.CollideClimbHop((int)ctx.Facing);
+            Debug.Log("=====ClimbHop");
+            //播放Hop的精灵动画
             //playFootstepOnLand = 0.5f;
 
-            Logging.Log($"===ClimbHop:{ctx.ClimbHopSolid==true}");
-            if (ctx.ClimbHopSolid)
+            //获取目标的落脚点
+            bool hit = ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing);
+            if (hit)
             {
-                //climbHopSolidPosition = climbHopSolid.Position;
                 ctx.HopWaitX = (int)ctx.Facing;
                 ctx.HopWaitXSpeed = (int)ctx.Facing * Constants.ClimbHopX;
             }
+            //ctx.ClimbHopSolid = ctx.CollideClimbHop((int)ctx.Facing);
+            //if (ctx.ClimbHopSolid)
+            //{
+            //    //climbHopSolidPosition = climbHopSolid.Position;
+            //    ctx.HopWaitX = (int)ctx.Facing;
+            //    ctx.HopWaitXSpeed = (int)ctx.Facing * Constants.ClimbHopX;
+            //}
             else
             {
                 ctx.HopWaitX = 0;
                 ctx.Speed.x = (int)ctx.Facing * Constants.ClimbHopX;
             }
 
-            ctx.Speed.y = Math.Min(ctx.Speed.y, Constants.ClimbHopY);
+            ctx.Speed.y = Math.Max(ctx.Speed.y, Constants.ClimbHopY);
             ctx.ForceMoveX = 0;
             ctx.ForceMoveXTimer = Constants.ClimbHopForceTime;
-            //fastJump = false;
-        }
+            //ctx.FastJump = false;
+        } 
     }
 }

@@ -72,7 +72,7 @@ namespace Myd.Platform.Demo
         public const float ClimbSlipSpeed = -3f;       //下滑速度
         public const float ClimbAccel = 90f;          //下滑加速度
         public const float ClimbGrabYMult = .2f;       //攀爬时抓取导致的Y轴速度衰减
-        public const float ClimbHopY = -12f;          //Hop的Y轴速度
+        public const float ClimbHopY = 12f;          //Hop的Y轴速度
         public const float ClimbHopX = 10f;           //Hop的X轴速度
         public const float ClimbHopForceTime = .2f;    //Hop时间
         public const float ClimbJumpBoostTime = .2f;   //WallBoost时间
@@ -80,6 +80,8 @@ namespace Myd.Platform.Demo
 
         #endregion
 
-       
+        #region Duck参数
+        const float DuckFriction = 50f;
+        #endregion
     }
 }
