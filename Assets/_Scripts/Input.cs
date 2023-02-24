@@ -24,26 +24,51 @@ namespace Myd.Platform.Demo
     public struct VisualButton
     {
         private KeyCode key;
+        private float bufferTime;
+        private bool consumed;
+        private float bufferCounter;
+        public VisualButton(KeyCode key) : this(key, 0) {
+        }
 
-        public VisualButton(KeyCode key)
+        public VisualButton(KeyCode key, float bufferTime)
         {
             this.key = key;
+            this.bufferTime = bufferTime;
+            this.consumed = false;
+            this.bufferCounter = 0f;
         }
 
         public bool Pressed()
         {
-            return UnityEngine.Input.GetKeyDown(key);
+            return UnityEngine.Input.GetKeyDown(key)||(!this.consumed && (this.bufferCounter > 0f));
         }
 
         public bool Checked()
         {
             return UnityEngine.Input.GetKey(key);
         }
+
+        public void Update(float deltaTime)
+        {
+            this.consumed = false;
+            this.bufferCounter -= deltaTime;
+            bool flag = false;
+            if (UnityEngine.Input.GetKeyDown(key))
+            {
+                this.bufferCounter = this.bufferTime;
+                flag = true;
+            }
+            if (!flag)
+            {
+                this.bufferCounter = 0f;
+                return;
+            }
+        }
     }
     public static class Input
     {
-        public static VisualButton Jump = new VisualButton(KeyCode.Space);
-        public static VisualButton Dash = new VisualButton(KeyCode.K);
+        public static VisualButton Jump = new VisualButton(KeyCode.Space, 0.2f);
+        public static VisualButton Dash = new VisualButton(KeyCode.K, 0.2f);
         public static VisualButton Grab = new VisualButton(KeyCode.J);
         public static VirtualJoystick Aim = new VirtualJoystick();
         public static Vector2 LastAim;
@@ -64,6 +89,12 @@ namespace Myd.Platform.Demo
                 Input.LastAim = value;
             }
             return Input.LastAim;
+        }
+
+        public static void Update(float deltaTime)
+        {
+            Jump.Update(deltaTime);
+            Dash.Update(deltaTime);
         }
     }
 

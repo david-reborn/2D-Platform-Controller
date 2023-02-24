@@ -37,6 +37,7 @@ namespace Myd.Platform.Demo
 
         void Update()
         {
+            Input.Update(Time.deltaTime);
             controller.Update(Time.deltaTime);
             Render();
         }
