@@ -83,5 +83,9 @@ namespace Myd.Platform.Demo
         #region Duck参数
         const float DuckFriction = 50f;
         #endregion
+
+        #region Corner Correct
+        const float UpwardCornerCorrection = 4f; //向上移动，X轴上边缘校正的最大距离
+        #endregion
     }
 }

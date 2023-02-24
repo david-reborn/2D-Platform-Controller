@@ -88,19 +88,25 @@ namespace Myd.Platform.Demo
         protected void UpdateCollideY(float distY)
         {
             Vector2 targetPosition = this.Position;
-            Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
-            Vector2 origion = this.Position + collider.position;
-            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
-            if (hit && hit.normal == -direct)
+            //使用校正
+            float distance = distY;
+            int correctTimes = controllerParams.UseCornerCorrection ? 10 : 0;  //默认可以迭代位置10次
+            while (true)
             {
-                //如果发生碰撞,则移动距离
-                targetPosition += direct * (hit.distance - DEVIATION);
+                float moved = MoveYStepWithCollide(distance);
+                //无碰撞退出循环
+                this.Position += Vector2.up * moved;
+                if (moved == distance || correctTimes == 0) //无碰撞，且校正次数为0
+                    break;
+                float tempDist = distance - moved;
+                correctTimes--;
+                if (!Correct(tempDist))
+                {
+                    this.Speed.y = 0;//校正失败，则速度清零
+                    break;
+                }
+                distance = tempDist;
             }
-            else
-            {
-                targetPosition += Vector2.up * distY;
-            }
-            this.Position = targetPosition;
         }
 
         //针对横向,进行碰撞检测.如果发生碰撞,
@@ -160,6 +166,64 @@ namespace Myd.Platform.Demo
 
         public bool ClimbHopBlockedCheck()
         {
+            return false;
+        }
+
+        //单步移动，参数和返回值都带方向，表示Y轴
+        private float MoveYStepWithCollide(float distY)
+        {
+            Vector2 moved = Vector2.zero;
+            Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
+            Vector2 origion = this.Position + collider.position;
+            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
+            if (hit && hit.normal == -direct)
+            {
+                //如果发生碰撞,则移动距离
+                moved += direct * Mathf.Max((hit.distance - DEVIATION), 0);
+            }
+            else
+            {
+                moved += Vector2.up * distY;
+            }
+            return moved.y;
+        }
+
+        private bool Correct(float distY)
+        {
+            Vector2 origion = this.Position + collider.position;
+            Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
+            //向上移动
+            if (this.Speed.y > 0)
+            {
+                //Corner Correction
+                {
+                    if (this.Speed.x <= 0)
+                    {
+                        for (int i = 1; i <= Constants.UpwardCornerCorrection; i++)
+                        {
+                            RaycastHit2D hit = Physics2D.BoxCast(origion + new Vector2(-i * 0.1f, 0), collider.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
+                            if (!hit)
+                            {
+                                this.Position += new Vector2(-i * 0.1f, 0);
+                                return true;
+                            }
+                        }
+                    }
+
+                    if (this.Speed.x >= 0)
+                    {
+                        for (int i = 1; i <= Constants.UpwardCornerCorrection; i++)
+                        {
+                            RaycastHit2D hit = Physics2D.BoxCast(origion + new Vector2(i * 0.1f, 0), collider.size, 0, direct, Mathf.Abs(distY) + DEVIATION, GroundMask);
+                            if (!hit)
+                            {
+                                this.Position += new Vector2(i * 0.1f, 0);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
             return false;
         }
     }

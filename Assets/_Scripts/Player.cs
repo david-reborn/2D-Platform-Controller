@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace Myd.Platform.Demo
 {
+
+    public struct ControllerParams
+    {
+        public bool UseCornerCorrection;
+    }
     public class Player : MonoBehaviour
     {
         PlayerController controller;
@@ -11,9 +16,22 @@ namespace Myd.Platform.Demo
         private SpriteRenderer spriteRenderer;
         [SerializeField]
         private ParticleSystem vfxMoveDust;
+        [Tooltip("参数")]
+        [SerializeField]
+        [Header("使用边界校正")]
+        private bool UseCornerCorrection;
+
+        private void OnValidate()
+        {
+            if (controller == null)
+                return;
+            Debug.Log("==刷新控制器参数");
+            controller.ResetControllerParams(new ControllerParams() { UseCornerCorrection = this.UseCornerCorrection });
+        }
+
         void Start()
         {
-            controller = new PlayerController(spriteRenderer);
+            controller = new PlayerController(spriteRenderer, new ControllerParams() { UseCornerCorrection= this.UseCornerCorrection });
             controller.Init(this.transform.position);
         }
 

@@ -44,8 +44,10 @@ namespace Myd.Platform.Demo
         private FiniteStateMachine<BaseActionState> stateMachine;
 
         public SpriteRenderer Renderer { get; set; }
-        public PlayerController(SpriteRenderer renderer)
+        private ControllerParams controllerParams;
+        public PlayerController(SpriteRenderer renderer, ControllerParams controllerParams)
         {
+            ResetControllerParams(controllerParams);
             //TODO 临时方案
             this.Renderer = renderer;
 
@@ -57,6 +59,11 @@ namespace Myd.Platform.Demo
 
             this.LastAim = Vector2.right;
             this.Facing = Facings.Right;
+        }
+
+        public void ResetControllerParams(ControllerParams controllerParams)
+        {
+            this.controllerParams = controllerParams;
         }
 
         public void Init(Vector2 position)
