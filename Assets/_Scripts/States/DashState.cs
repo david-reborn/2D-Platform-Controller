@@ -55,8 +55,8 @@ namespace Myd.Platform.Demo
             //
             var dir = ctx.LastAim;
             var newSpeed = dir * Constants.DashSpeed;
-            if (Math.Sign(beforeDashSpeed.x) == Math.Sign(newSpeed.x) && Math.Abs(beforeDashSpeed.x) > Math.Abs(newSpeed.x))
-                newSpeed.x = beforeDashSpeed.x;
+            //if (Math.Sign(beforeDashSpeed.x) == Math.Sign(newSpeed.x) && Math.Abs(beforeDashSpeed.x) > Math.Abs(newSpeed.x))
+            //    newSpeed.x = beforeDashSpeed.x;
             ctx.Speed = newSpeed;
 
             DashDir = dir;

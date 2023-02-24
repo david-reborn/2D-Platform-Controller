@@ -30,6 +30,7 @@ namespace Myd.Platform.Demo
         public override void OnEnd()
         {
             this.ctx.WallSpeedRetentionTimer = 0;
+            this.ctx.HopWaitX = 0;
         }
 
         public override EActionState Update(float deltaTime)
@@ -98,7 +99,7 @@ namespace Myd.Platform.Demo
             //水平面上移动,计算阻力
             if (ctx.Ducking && ctx.OnGround)
             {
-                ctx.Speed.x = Mathf.MoveTowards(ctx.Speed.x, 0, Constants.DuckFriction * Time.deltaTime);
+                ctx.Speed.x = Mathf.MoveTowards(ctx.Speed.x, 0, Constants.DuckFriction * deltaTime);
             }
             else
             {
@@ -120,22 +121,24 @@ namespace Myd.Platform.Demo
             {
                 //计算最大下落速度
                 {
-                    float maxFallSpeed = this.ctx.MaxFall;
+                    float maxFallSpeed = Constants.MaxFall;
                     float fastMaxFallSpeed = Constants.FastMaxFall;
 
-                    //if (this.ctx.MoveY == -1 && speed.y <= maxFallSpeed)
-                    //{
-                    //    this.ctx.MaxFall = Mathf.MoveTowards(this.ctx.MaxFall, fastMaxFallSpeed, Constants.FastMaxAccel * deltaTime);
+                    if (this.ctx.MoveY == -1 && this.ctx.Speed.y <= maxFallSpeed)
+                    {
+                        this.ctx.MaxFall = Mathf.MoveTowards(this.ctx.MaxFall, fastMaxFallSpeed, Constants.FastMaxAccel * deltaTime);
 
-                    //    float half = maxFallSpeed + (fastMaxFallSpeed - maxFallSpeed) * .5f;
-                    //    if (speed.y >= half)
-                    //    {
-                    //        float spriteLerp = Math.Min(1f, (speed.y - half) / (fastMaxFallSpeed - half));
-                    //        //Sprite.Scale.X = Mathf.Lerp(1f, .5f, spriteLerp);
-                    //        //Sprite.Scale.Y = Mathf.Lerp(1f, 1.5f, spriteLerp);
-                    //    }
-                    //}
-                    //else
+                        float half = maxFallSpeed + (fastMaxFallSpeed - maxFallSpeed) * .5f;
+                        if (this.ctx.Speed.y >= half)
+                        {
+                            float spriteLerp = Math.Min(1f, (this.ctx.Speed.y - half) / (fastMaxFallSpeed - half));
+                            Vector2 scale = Vector2.zero;
+                            scale.x = Mathf.Lerp(1f, 0.5f, spriteLerp);
+                            scale.y = Mathf.Lerp(1f, 1.5f, spriteLerp);
+                            this.ctx.Scale = scale;
+                        }
+                    }
+                    else
                     {
                         this.ctx.MaxFall = Mathf.MoveTowards(this.ctx.MaxFall, maxFallSpeed, Constants.FastMaxAccel * deltaTime);
                     }
@@ -145,7 +148,7 @@ namespace Myd.Platform.Demo
                 {
                     float max = this.ctx.MaxFall;//最大下落速度
                     //Wall Slide
-                    if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && Input.Grab.Checked())) && ctx.MoveY != 1)
+                    if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && Input.Grab.Checked())) && ctx.MoveY != -1)
                     {
                         //判断是否向下做Wall滑行
                         if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck)
@@ -159,7 +162,7 @@ namespace Myd.Platform.Demo
                             //if (ctx.WallSlideTimer > Constants.WallSlideTime * 0.5f && ClimbBlocker.Check(level, this, Position + Vector2.UnitX * wallSlideDir))
                             //    ctx.WallSlideTimer = Constants.WallSlideTime * .5f;
 
-                            max = Mathf.Lerp(ctx.MaxFall, Constants.WallSlideStartMax, ctx.WallSlideTimer / Constants.WallSlideTime);
+                            max = Mathf.Lerp(Constants.MaxFall, Constants.WallSlideStartMax, ctx.WallSlideTimer / Constants.WallSlideTime);
                             if ((ctx.WallSlideTimer / Constants.WallSlideTime) > .65f)
                             {
                                 //TODO 播放特效

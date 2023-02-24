@@ -13,6 +13,7 @@ namespace Myd.Platform.Demo
 
         public Vector2 CurrSpriteScale { get; set; } = NORMAL_SPRITE_SCALE;
 
+        //处理缩放
         private void UpdateSprite(float deltaTime)
         {
             Vector2 tempScale = Scale;

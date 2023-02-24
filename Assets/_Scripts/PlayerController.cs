@@ -77,7 +77,7 @@ namespace Myd.Platform.Demo
 
         public void Update(float deltaTime)
         {
-            //更新变量状态
+            //更新各个组件中变量的状态
             {
                 //Get ground
                 if (Speed.y <= 0)
@@ -188,7 +188,7 @@ namespace Myd.Platform.Demo
                 }
             }
 
-            //处理逻辑
+            //状态机更新逻辑
             stateMachine.Update(deltaTime);
 
             //更新位置
