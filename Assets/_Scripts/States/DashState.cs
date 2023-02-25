@@ -66,6 +66,15 @@ namespace Myd.Platform.Demo
 
             yield return Constants.DashTime;
             CreateTrail();
+            if (this.DashDir.y >= 0)
+            {
+                ctx.Speed = DashDir * Constants.EndDashSpeed;
+                //ctx.Speed.x *= swapCancel.X;
+                //ctx.Speed.y *= swapCancel.Y;
+            }
+            if (ctx.Speed.y > 0)
+                ctx.Speed.y *= Constants.EndDashUpMult;
+
             this.ctx.SetState((int)EActionState.Normal);
         }
 
