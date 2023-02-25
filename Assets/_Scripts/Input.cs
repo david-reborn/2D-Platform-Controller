@@ -88,7 +88,7 @@ namespace Myd.Platform.Demo
             {
                 Input.LastAim = value;
             }
-            return Input.LastAim;
+            return Input.LastAim.normalized;
         }
 
         public static void Update(float deltaTime)
