@@ -15,7 +15,6 @@ namespace Myd.Platform.Demo
         private const int MaxDashes = 1;    // 最大Dash次数
         private readonly int GroundMask;
 
-        Vector2 scale;
         Vector2 size;
         float jumpGraceTimer;
         float varJumpTimer;
@@ -135,7 +134,6 @@ namespace Myd.Platform.Demo
                         wallSpeedRetentionTimer = 0;
                     else if (!CollideCheck(Position, Vector2.right * Math.Sign(wallSpeedRetained)))
                     {
-                        Debug.Log($"====UseWallSpeed:{wallSpeedRetained}");
                         Speed.x = wallSpeedRetained;
                         wallSpeedRetentionTimer = 0;
                     }
@@ -231,7 +229,6 @@ namespace Myd.Platform.Demo
             if (this.dashes < MaxDashes)
             {
                 this.dashes = MaxDashes;
-                Debug.Log("[Dash]===========RefillDash");
                 return true;
             }
             else

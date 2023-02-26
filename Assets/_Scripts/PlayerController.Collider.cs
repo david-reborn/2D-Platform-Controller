@@ -91,13 +91,18 @@ namespace Myd.Platform.Demo
             //使用校正
             float distance = distY;
             int correctTimes = controllerParams.UseCornerCorrection ? 10 : 0;  //默认可以迭代位置10次
+            bool collided = true;
+            float speedY = Mathf.Abs(this.Speed.y);
             while (true)
             {
                 float moved = MoveYStepWithCollide(distance);
                 //无碰撞退出循环
                 this.Position += Vector2.up * moved;
                 if (moved == distance || correctTimes == 0) //无碰撞，且校正次数为0
+                {
+                    collided = false;
                     break;
+                }
                 float tempDist = distance - moved;
                 correctTimes--;
                 if (!Correct(tempDist))
@@ -106,6 +111,18 @@ namespace Myd.Platform.Demo
                     break;
                 }
                 distance = tempDist;
+            }
+             
+            //落地时候，进行缩放
+            if (collided && distY < 0)
+            { 
+                if (this.stateMachine.State != (int)EActionState.Climb)
+                {
+                    float squish = Math.Min(speedY / Mathf.Abs(Constants.FastMaxFall), 1);
+                    float scaleX = Mathf.Lerp(1, 1.6f, squish);
+                    float scaleY = Mathf.Lerp(1, .4f, squish);
+                    this.Scale = new Vector2(scaleX, scaleY);
+                }
             }
         }
 

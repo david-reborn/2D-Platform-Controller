@@ -16,10 +16,9 @@ namespace Myd.Platform.Demo
         //处理缩放
         private void UpdateSprite(float deltaTime)
         {
-            Vector2 tempScale = Scale;
-            tempScale.x = Mathf.MoveTowards(tempScale.x, CurrSpriteScale.x, 1.75f * deltaTime);
-            tempScale.y = Mathf.MoveTowards(tempScale.y, CurrSpriteScale.y, 1.75f * deltaTime);
-            Scale = tempScale;
+            float tempScaleX = Mathf.MoveTowards(Scale.x, CurrSpriteScale.x, 1.75f * deltaTime);
+            float tempScaleY = Mathf.MoveTowards(Scale.y, CurrSpriteScale.y, 1.75f * deltaTime);
+            this.Scale = new Vector2(tempScaleX, tempScaleY);
         }
     }
 
