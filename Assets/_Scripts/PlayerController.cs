@@ -26,6 +26,7 @@ namespace Myd.Platform.Demo
         private float dashCooldownTimer;                //冲刺冷却时间计数器，为0时，可以再次冲刺
         private float dashRefillCooldownTimer;          //
         public int dashes;
+        public int lastDashes;
         private float wallSpeedRetentionTimer; // If you hit a wall, start this timer. If coast is clear within this timer, retain h-speed
         private float wallSpeedRetained;
 
@@ -75,6 +76,16 @@ namespace Myd.Platform.Demo
             this.dashes = 1;
             this.Position = position;
             this.collider = normalHitbox;
+
+            Color color = NormalHairColor;
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
+            );
+
+            this.player.SetTrailColor(gradient);
+
         }
 
         public void Update(float deltaTime)
@@ -203,6 +214,53 @@ namespace Myd.Platform.Demo
 
             //更新
             UpdateSprite(deltaTime);
+
+
+            UpdateHair(deltaTime);
+        }
+
+        private Color hairColor;
+        private float hairFlashTimer;
+        //Gradient gradient = new Gradient();
+        
+        private void SetHairColor(Color color)
+        {
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
+                new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
+            );
+            this.player.SetTrailColor(gradient);
+        }
+        private void UpdateHair(float deltaTime)
+        {
+            if (this.dashes == 0 && this.dashes < MaxDashes)
+            {
+                hairColor = Color.Lerp(hairColor, UsedHairColor, 6f * deltaTime);
+                SetHairColor(hairColor);
+            }
+            else
+            {
+                Color color;
+                if (this.lastDashes != this.dashes)
+                {
+                    color = FlashHairColor;
+                    hairFlashTimer = .12f;
+                }
+                else if (hairFlashTimer > 0)
+                {
+                    color = FlashHairColor;
+                    hairFlashTimer -= deltaTime;
+                }
+                else if (this.dashes == 2)
+                    color = Color.black;//TwoDashesHairColor;
+                else
+                    color = NormalHairColor;
+
+                this.hairColor = color;
+                SetHairColor(hairColor);
+            }
+            lastDashes = dashes;
         }
 
         public void Render()
@@ -212,6 +270,7 @@ namespace Myd.Platform.Demo
         //处理跳跃
         public void Jump()
         {
+            Input.Jump.ConsumeBuffer();
             this.jumpGraceTimer = 0;
             this.WallSlideTimer = Constants.WallSlideTime;
 
@@ -287,7 +346,7 @@ namespace Myd.Platform.Demo
         {
             //wasDashB = Dashes == 2;
             this.dashes = Math.Max(0, this.dashes - 1);
-            //Input.Dash.ConsumeBuffer();
+            Input.Dash.ConsumeBuffer();
             return EActionState.Dash;
         }
         public void SetState(int state)
@@ -299,6 +358,7 @@ namespace Myd.Platform.Demo
 
         public void WallJump(int dir)
         {
+            Input.Jump.ConsumeBuffer();
             Ducking = false;
             jumpGraceTimer = 0;
             varJumpTimer = Constants.VarJumpTime;

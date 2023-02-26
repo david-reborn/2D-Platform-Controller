@@ -15,6 +15,8 @@ namespace Myd.Platform.Demo
         [SerializeField]
         private SpriteRenderer spriteRenderer;
         [SerializeField]
+        private TrailRenderer trailRenderer;
+        [SerializeField]
         private ParticleSystem vfxMoveDust;
         [SerializeField]
         private ParticleSystem vfxJumpDust;
@@ -41,6 +43,8 @@ namespace Myd.Platform.Demo
             controller.Init(this.transform.position);
 
             this.vfxJumpDust.Stop();
+            //trailRenderer.material = new Material(Shader.Find("Sprites/Default"));
+
         }
 
         void Update()
@@ -94,6 +98,11 @@ namespace Myd.Platform.Demo
             //Gizmos.DrawLine(controller.Position + rect.position, controller.Position + rect.position + Vector2.right);
 
             controller.Draw(EGizmoDrawType.SlipCheck);
+        }
+
+        public void SetTrailColor(Gradient gradient)
+        {
+            trailRenderer.colorGradient = gradient;
         }
     }
 

@@ -13,6 +13,11 @@ namespace Myd.Platform.Demo
 
         public Vector2 CurrSpriteScale { get; set; } = NORMAL_SPRITE_SCALE;
 
+        public Color NormalHairColor = new Color32(0xAC, 0x32, 0x32, 0xFF);//00FFA2
+        public Color UsedHairColor = new Color32(0x44, 0xB7, 0xFF, 0xFF);
+        public Color FlashHairColor = Color.white;
+
+
         //处理缩放
         private void UpdateSprite(float deltaTime)
         {

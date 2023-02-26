@@ -37,6 +37,10 @@ namespace Myd.Platform.Demo
             this.consumed = false;
             this.bufferCounter = 0f;
         }
+        public void ConsumeBuffer()
+        {
+            this.bufferCounter = 0f;
+        }
 
         public bool Pressed()
         {
@@ -58,6 +62,10 @@ namespace Myd.Platform.Demo
                 this.bufferCounter = this.bufferTime;
                 flag = true;
             }
+            else if (UnityEngine.Input.GetKey(key))
+            {
+                flag = true;
+            }
             if (!flag)
             {
                 this.bufferCounter = 0f;
@@ -67,8 +75,8 @@ namespace Myd.Platform.Demo
     }
     public static class Input
     {
-        public static VisualButton Jump = new VisualButton(KeyCode.Space, 0.2f);
-        public static VisualButton Dash = new VisualButton(KeyCode.K, 0.2f);
+        public static VisualButton Jump = new VisualButton(KeyCode.Space, 0.08f);
+        public static VisualButton Dash = new VisualButton(KeyCode.K, 0.08f);
         public static VisualButton Grab = new VisualButton(KeyCode.J);
         public static VirtualJoystick Aim = new VirtualJoystick();
         public static Vector2 LastAim;
