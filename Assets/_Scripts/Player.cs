@@ -16,10 +16,16 @@ namespace Myd.Platform.Demo
         private SpriteRenderer spriteRenderer;
         [SerializeField]
         private ParticleSystem vfxMoveDust;
+        [SerializeField]
+        private ParticleSystem vfxJumpDust;
+        [SerializeField]
+        private ParticleSystem vfxFallDust;
         [Tooltip("参数")]
         [SerializeField]
         [Header("使用边界校正")]
         private bool UseCornerCorrection;
+
+        public SpriteRenderer SpriteRenderer => this.spriteRenderer;
 
         private void OnValidate()
         {
@@ -31,8 +37,10 @@ namespace Myd.Platform.Demo
 
         void Start()
         {
-            controller = new PlayerController(spriteRenderer, new ControllerParams() { UseCornerCorrection= this.UseCornerCorrection });
+            controller = new PlayerController(this, new ControllerParams() { UseCornerCorrection= this.UseCornerCorrection });
             controller.Init(this.transform.position);
+
+            this.vfxJumpDust.Stop();
         }
 
         void Update()
@@ -59,6 +67,23 @@ namespace Myd.Platform.Demo
             if (lastFrameOnGround && !this.controller.OnGround)
                 this.vfxMoveDust.Stop();
             lastFrameOnGround = this.controller.OnGround;
+
+            if (this.controller.IsFall)
+            {
+                PlayFallEffect();
+            }
+        }
+
+        public void PlayJumpEffect()
+        {
+            this.vfxJumpDust.transform.position = this.spriteRenderer.transform.position;
+            this.vfxJumpDust.Play();
+        }
+
+        public void PlayFallEffect()
+        {
+            this.vfxFallDust.transform.position = this.spriteRenderer.transform.position;
+            this.vfxFallDust.Play();
         }
 
         private void OnDrawGizmos()

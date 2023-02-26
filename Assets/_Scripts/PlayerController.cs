@@ -34,6 +34,7 @@ namespace Myd.Platform.Demo
         public int WallSlideDir { get; set; }
 
         private bool onGround;
+        private bool wasOnGround;
 
         public int ForceMoveX { get; set; }
         public float ForceMoveXTimer { get; set; }
@@ -45,11 +46,13 @@ namespace Myd.Platform.Demo
 
         public SpriteRenderer Renderer { get; set; }
         private ControllerParams controllerParams;
-        public PlayerController(SpriteRenderer renderer, ControllerParams controllerParams)
+        private Player player;
+        public PlayerController(Player player, ControllerParams controllerParams)
         {
+            this.player = player;
             ResetControllerParams(controllerParams);
             //TODO 临时方案
-            this.Renderer = renderer;
+            this.Renderer = player.SpriteRenderer;
 
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
             this.stateMachine.AddState(new NormalState(this));
@@ -80,6 +83,7 @@ namespace Myd.Platform.Demo
             //更新各个组件中变量的状态
             {
                 //Get ground
+                wasOnGround = onGround;
                 if (Speed.y <= 0)
                 {
                     this.onGround = CheckGround();//碰撞检测地面
@@ -190,7 +194,6 @@ namespace Myd.Platform.Demo
 
             //状态机更新逻辑
             stateMachine.Update(deltaTime);
-
             //更新位置
             UpdateCollideX(Speed.x * deltaTime);
             UpdateCollideY(Speed.y * deltaTime);
@@ -219,6 +222,8 @@ namespace Myd.Platform.Demo
             this.varJumpSpeed = Constants.JumpSpeed;
 
             this.Scale = new Vector2(.6f, 1.4f);
+
+            this.player.PlayJumpEffect();
         }
 
         public bool RefillDash()
@@ -379,6 +384,14 @@ namespace Myd.Platform.Demo
                 bool noCollide = !CollideCheck(this.Position, Vector2.zero);
                 this.collider = lastCollider;
                 return noCollide;
+            }
+        }
+
+        public bool IsFall
+        {
+            get
+            {
+                return !this.wasOnGround && this.OnGround;
             }
         }
     }
