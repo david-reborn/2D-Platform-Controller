@@ -42,6 +42,9 @@ namespace Myd.Platform.Demo
         public int HopWaitX;   // If you climb hop onto a moving solid, snap to beside it until you get above it
         public float HopWaitXSpeed;
 
+        public int wallBoostDir;
+        public float wallBoostTimer;   // If you climb jump and then do a sideways input within this timer, switch to wall jump
+
         private FiniteStateMachine<BaseActionState> stateMachine;
 
         public SpriteRenderer Renderer { get; set; }
@@ -111,13 +114,66 @@ namespace Myd.Platform.Demo
                     this.WallSlideDir = 0;
                 }
 
-                //TODO Wall Boost
+                //Wall Boost, 不消耗体力WallJump
+                if (wallBoostTimer > 0)
+                {
+                    wallBoostTimer -= deltaTime;
+                    if (moveX == wallBoostDir)
+                    {
+                        this.Speed.x = Constants.WallJumpHSpeed * moveX;
+                        wallBoostTimer = 0;
+                    }
+                }
                 //After Dash
                 if (this.onGround && this.stateMachine.State != (int)EActionState.Climb)
                 {
                     //AutoJump = false;
                     //Stamina = ClimbMaxStamina;
                     this.WallSlideTimer = Constants.WallSlideTime;
+                }
+
+                //Dash Attack
+
+                //Jump Grace
+                if (OnGround)
+                {
+                    //dreamJump = false;
+                    jumpGraceTimer = Constants.JumpGraceTime;
+                }
+                else
+                {
+                    if (jumpGraceTimer > 0)
+                    {
+                        jumpGraceTimer -= deltaTime;
+                    }
+                }
+
+                //撞墙以后的速度保持，Wall Speed Retention
+                if (wallSpeedRetentionTimer > 0)
+                {
+                    if (Math.Sign(Speed.x) == -Math.Sign(wallSpeedRetained))
+                        wallSpeedRetentionTimer = 0;
+                    else if (!CollideCheck(Position, Vector2.right * Math.Sign(wallSpeedRetained)))
+                    {
+                        Speed.x = wallSpeedRetained;
+                        wallSpeedRetentionTimer = 0;
+                    }
+                    else
+                        wallSpeedRetentionTimer -= deltaTime;
+                }
+
+                //Dash
+                {
+                    if (dashCooldownTimer > 0)
+                        dashCooldownTimer -= deltaTime;
+                    if (dashRefillCooldownTimer > 0)
+                    {
+                        dashRefillCooldownTimer -= deltaTime;
+                    }
+                    else if (onGround)
+                    {
+                        RefillDash();
+                    }
                 }
 
                 //Var Jump
@@ -138,19 +194,12 @@ namespace Myd.Platform.Demo
                     this.moveX = Math.Sign(UnityEngine.Input.GetAxisRaw("Horizontal"));
                 }
 
-                //撞墙以后的速度保持，Wall Speed Retention
-                if (wallSpeedRetentionTimer > 0)
+                //Facing
+                if (moveX != 0 && this.stateMachine.State != (int)EActionState.Climb)
                 {
-                    if (Math.Sign(Speed.x) == -Math.Sign(wallSpeedRetained))
-                        wallSpeedRetentionTimer = 0;
-                    else if (!CollideCheck(Position, Vector2.right * Math.Sign(wallSpeedRetained)))
-                    {
-                        Speed.x = wallSpeedRetained;
-                        wallSpeedRetentionTimer = 0;
-                    }
-                    else
-                        wallSpeedRetentionTimer -= deltaTime;
+                    Facing = (Facings)moveX;
                 }
+                LastAim = Input.GetAimVector(Facing);
 
                 //Hop Wait X
                 if (this.HopWaitX != 0)
@@ -162,42 +211,6 @@ namespace Myd.Platform.Demo
                         Speed.x = this.HopWaitXSpeed;
                         this.HopWaitX = 0;
                     }
-                }
-
-                //更新冲刺冷却时间
-                {
-                    if (dashCooldownTimer > 0)
-                        dashCooldownTimer -= deltaTime;
-                    if (dashRefillCooldownTimer > 0)
-                    {
-                        dashRefillCooldownTimer -= deltaTime;
-                    }
-                    else if (onGround)
-                    {
-                        RefillDash();
-                    }
-                }
-
-                //Facing
-                //if (moveX != 0 && InControl && StateMachine.State != StClimb && StateMachine.State != StPickup && StateMachine.State != StRedDash && StateMachine.State != StHitSquash)
-                if (moveX != 0 && this.stateMachine.State != (int)EActionState.Climb)
-                {
-                    Facing = (Facings)moveX;
-                }
-                LastAim = Input.GetAimVector(Facing);
-            }
-
-            //落地设置土狼时间
-            if (OnGround)
-            {
-                //dreamJump = false;
-                jumpGraceTimer = Constants.JumpGraceTime;
-            }
-            else
-            {
-                if (jumpGraceTimer > 0)
-                {
-                    jumpGraceTimer -= deltaTime;
                 }
             }
 
@@ -277,7 +290,8 @@ namespace Myd.Platform.Demo
             this.varJumpTimer = Constants.VarJumpTime;
             this.Speed.x += Constants.JumpHBoost * moveX;
             this.Speed.y = Constants.JumpSpeed;
-            this.varJumpSpeed = Constants.JumpSpeed;
+            //Speed += LiftBoost;
+            this.varJumpSpeed = this.Speed.y;
 
             this.Scale = new Vector2(.6f, 1.4f);
 
@@ -332,8 +346,8 @@ namespace Myd.Platform.Demo
             Jump();
             if (moveX == 0)
             {
-                //this.WallBoostDir = -(int)Facing;
-                //this.wallBoostTimer = ClimbJumpBoostTime;
+                this.wallBoostDir = -(int)Facing;
+                this.wallBoostTimer = Constants.ClimbJumpBoostTime;
             }
         }
 
