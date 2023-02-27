@@ -267,7 +267,7 @@ namespace Myd.Platform.Demo
         {
         }
 
-        //处理跳跃
+        //处理跳跃,跳跃时候，会给跳跃前方一个额外的速度
         public void Jump()
         {
             Input.Jump.ConsumeBuffer();
@@ -275,12 +275,91 @@ namespace Myd.Platform.Demo
             this.WallSlideTimer = Constants.WallSlideTime;
 
             this.varJumpTimer = Constants.VarJumpTime;
+            this.Speed.x += Constants.JumpHBoost * moveX;
             this.Speed.y = Constants.JumpSpeed;
             this.varJumpSpeed = Constants.JumpSpeed;
 
             this.Scale = new Vector2(.6f, 1.4f);
 
             this.player.PlayJumpEffect();
+
+            //蹬墙的粒子效果
+        }
+
+        //SuperJump，表示在地面上或者土狼时间内，Dash接跳跃。
+        //数值方便和Jump类似，数值变大。
+        //蹲伏状态的SuperJump需要额外处理。
+        public void SuperJump()
+        {
+            
+        }
+
+        //在墙边情况下的，跳跃。主要需要考虑当前跳跃朝向
+        public void WallJump(int dir)
+        {
+            Input.Jump.ConsumeBuffer();
+            Ducking = false;
+            jumpGraceTimer = 0;
+            varJumpTimer = Constants.VarJumpTime;
+            WallSlideTimer = Constants.WallSlideTime;
+            //WallBoostTimer = 0;
+            if (moveX != 0)
+            {
+                this.ForceMoveX = dir;
+                this.ForceMoveXTimer = Constants.WallJumpForceTime;
+            }
+
+            //TODO 考虑电梯对速度的加成
+            Speed.x = Constants.WallJumpHSpeed * dir;
+            Speed.y = Constants.JumpSpeed;
+            //Speed += LiftBoost;
+            varJumpSpeed = Speed.y;
+
+            this.Scale = new Vector2(.6f, 1.4f);
+
+            //TODO，墙上的粒子效果。
+        }
+
+        public void ClimbJump()
+        {
+            if (!onGround)
+            {
+                //Stamina -= ClimbJumpCost;
+
+                //sweatSprite.Play("jump", true);
+                //Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
+            }
+            Jump();
+            if (moveX == 0)
+            {
+                //this.WallBoostDir = -(int)Facing;
+                //this.wallBoostTimer = ClimbJumpBoostTime;
+            }
+        }
+
+        //在墙边Dash时，当前按住上，不按左右时，执行SuperWallJump
+        public void SuperWallJump(int dir)
+        {
+            Input.Jump.ConsumeBuffer();
+            Ducking = false;
+            jumpGraceTimer = 0;
+            varJumpTimer = Constants.SuperWallJumpVarTime;
+            WallSlideTimer = Constants.WallSlideTime;
+            //WallBoostTimer = 0;
+
+            //TODO 考虑电梯对速度的加成
+            Speed.x = Constants.SuperWallJumpH * dir;
+            Speed.y = Constants.SuperWallJumpSpeed;
+            //Speed += LiftBoost;
+            varJumpSpeed = Speed.y;
+
+            this.Scale = new Vector2(.6f, 1.4f);
+        }
+
+        //反弹
+        public  void Bounce(float flowY)
+        {
+
         }
 
         public bool RefillDash()
@@ -354,46 +433,6 @@ namespace Myd.Platform.Demo
             this.stateMachine.State = state;
         }
         #endregion
-
-
-        public void WallJump(int dir)
-        {
-            Input.Jump.ConsumeBuffer();
-            Ducking = false;
-            jumpGraceTimer = 0;
-            varJumpTimer = Constants.VarJumpTime;
-            //dashAttackTimer = 0;
-            WallSlideTimer = Constants.WallSlideTime;
-            //WallBoostTimer = 0;
-            if (moveX != 0)
-            {
-                this.ForceMoveX = dir;
-                this.ForceMoveXTimer = Constants.WallJumpForceTime;
-            }
-
-            //TODO 考虑电梯对速度的加成
-            Speed.x = Constants.WallJumpHSpeed * dir;
-            Speed.y = Constants.JumpSpeed;
-            //Speed += LiftBoost;
-            varJumpSpeed = Speed.y;
-        }
-
-        public void ClimbJump()
-        {
-            if (!onGround)
-            {
-                //Stamina -= ClimbJumpCost;
-
-                //sweatSprite.Play("jump", true);
-                //Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
-            }
-            Jump();
-            if (moveX == 0)
-            {
-                //this.WallBoostDir = -(int)Facing;
-                //this.wallBoostTimer = ClimbJumpBoostTime;
-            }
-        }
 
         public bool Ducking
         {

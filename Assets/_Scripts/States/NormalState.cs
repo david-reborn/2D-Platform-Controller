@@ -197,24 +197,22 @@ namespace Myd.Platform.Demo
                     this.ctx.Jump();
                 }else if (ctx.CanUnDuck)
                 {
+                    //如果右侧有墙
                     if (ctx.WallJumpCheck(1))
                     {
-                        if (ctx.Facing == Facings.Right && Input.Grab.Checked())// && Stamina > 0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * WallJumpCheckDist))
+                        if (ctx.Facing == Facings.Right && Input.Grab.Checked())
                             ctx.ClimbJump();
-                        //else if (DashAttacking && DashDir.X == 0 && DashDir.Y == -1)
-                        //    SuperWallJump(-1);
                         else
                             ctx.WallJump(-1);
                     }
-                    //else if (ctx.WallJumpCheck(-1))
-                    //{
-                    //    if (Facing == Facings.Left && Input.Grab.Check && Stamina > 0 && Holding == null && !ClimbBlocker.Check(Scene, this, Position + Vector2.UnitX * -WallJumpCheckDist))
-                    //        ClimbJump();
-                    //    else if (DashAttacking && DashDir.X == 0 && DashDir.Y == -1)
-                    //        SuperWallJump(1);
-                    //    else
-                    //        WallJump(1);
-                    //}
+                    //如果左侧有墙
+                    else if (ctx.WallJumpCheck(-1))
+                    {
+                        if (ctx.Facing == Facings.Left && Input.Grab.Checked())
+                            ctx.ClimbJump();
+                        else
+                            ctx.WallJump(1);
+                    }
                 }
             }
 

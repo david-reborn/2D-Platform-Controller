@@ -36,9 +36,52 @@ namespace Myd.Platform.Demo
         {
             //Trail
             //Grab Holdables
+
+
             //Super Jump
-            //Wall Super Jump
-            //Wall Jump
+            if (DashDir.y == 0)
+            {
+
+            }
+            //Super Wall Jump
+            if (DashDir.x == 0 && DashDir.y == 1)
+            {
+                //向上Dash情况下，检测SuperWallJump
+                if (Input.Jump.Pressed() && ctx.CanUnDuck)
+                {
+                    if (ctx.WallJumpCheck(1))
+                    {
+                        ctx.SuperWallJump(-1);
+                        return EActionState.Normal;
+                    }
+                    else if (ctx.WallJumpCheck(-1))
+                    {
+                        ctx.SuperWallJump(1);
+                        return EActionState.Normal;
+                    }
+                }
+            }
+            else
+            {
+                //Dash状态下执行WallJump，并切换到Normal状态
+                if (Input.Jump.Pressed() && ctx.CanUnDuck)
+                {
+                    if (ctx.WallJumpCheck(1))
+                    {
+                        ctx.WallJump(-1);
+                        return EActionState.Normal;
+                    }
+                    else if (ctx.WallJumpCheck(-1))
+                    {
+                        ctx.WallJump(1);
+                        return EActionState.Normal;
+                    }
+                }
+            }
+
+
+
+
             if (ctx.DashTrailTimer > 0)
             {
                 ctx.DashTrailTimer -= deltaTime;
