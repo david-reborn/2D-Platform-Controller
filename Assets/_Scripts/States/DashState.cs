@@ -35,13 +35,23 @@ namespace Myd.Platform.Demo
         public override EActionState Update(float deltaTime)
         {
             //Trail
+            if (ctx.DashTrailTimer > 0)
+            {
+                ctx.DashTrailTimer -= deltaTime;
+                if (ctx.DashTrailTimer <= 0)
+                    CreateTrail();
+            }
             //Grab Holdables
-
 
             //Super Jump
             if (DashDir.y == 0)
             {
-
+                //Super Jump
+                if (ctx.CanUnDuck && Input.Jump.Pressed() && ctx.JumpGraceTimer > 0)
+                {
+                    ctx.SuperJump();
+                    return EActionState.Normal;
+                }
             }
             //Super Wall Jump
             if (DashDir.x == 0 && DashDir.y == 1)
@@ -79,16 +89,6 @@ namespace Myd.Platform.Demo
                 }
             }
 
-
-
-
-            if (ctx.DashTrailTimer > 0)
-            {
-                ctx.DashTrailTimer -= deltaTime;
-                if (ctx.DashTrailTimer <= 0)
-                    CreateTrail();
-            }
-
             return state;
         }
 
@@ -103,6 +103,10 @@ namespace Myd.Platform.Demo
             ctx.Speed = newSpeed;
 
             DashDir = dir;
+            if (DashDir.x != 0)
+                ctx.Facing = (Facings)Math.Sign(DashDir.x);
+
+            //TODO Dash Slide
 
             CreateTrail();
             ctx.DashTrailTimer = .08f;

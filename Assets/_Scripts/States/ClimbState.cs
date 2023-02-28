@@ -27,9 +27,8 @@ namespace Myd.Platform.Demo
 
         public override void OnBegin()
         {
-            Vector2 tempSpeed = ctx.Speed;
-            tempSpeed.x = 0;
-            tempSpeed.y *= Constants.ClimbGrabYMult;
+            ctx.Speed.x = 0;
+            ctx.Speed.y *= Constants.ClimbGrabYMult;
             //TODO 其他参数
             ctx.WallSlideTimer = Constants.WallSlideTime;
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
