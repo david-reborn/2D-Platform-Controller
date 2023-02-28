@@ -129,7 +129,7 @@ namespace Myd.Platform.Demo
                         this.ctx.MaxFall = Mathf.MoveTowards(this.ctx.MaxFall, fastMaxFallSpeed, Constants.FastMaxAccel * deltaTime);
 
                         float half = maxFallSpeed + (fastMaxFallSpeed - maxFallSpeed) * .5f;
-                        if (this.ctx.Speed.y >= half)
+                        if (this.ctx.Speed.y <= half)
                         {
                             float spriteLerp = Math.Min(1f, (this.ctx.Speed.y - half) / (fastMaxFallSpeed - half));
                             Vector2 scale = Vector2.zero;
