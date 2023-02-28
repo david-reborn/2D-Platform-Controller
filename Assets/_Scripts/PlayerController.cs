@@ -42,6 +42,7 @@ namespace Myd.Platform.Demo
         public int HopWaitX;   // If you climb hop onto a moving solid, snap to beside it until you get above it
         public float HopWaitXSpeed;
 
+        public bool WallBoosting;
         public int wallBoostDir;
         public float wallBoostTimer;   // If you climb jump and then do a sideways input within this timer, switch to wall jump
 

@@ -33,6 +33,12 @@ namespace Myd.Platform.Demo
             ctx.WallSlideTimer = Constants.WallSlideTime;
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
+            //两个像素的吸附功能
+            //for (int i = 0; i < ClimbCheckDist; i++)
+            //    if (!CollideCheck<Solid>(Position + Vector2.UnitX * (int)Facing))
+            //        Position += Vector2.UnitX * (int)Facing;
+            //    else
+            //        break;
             //TODO 表现
         }
 
@@ -45,7 +51,7 @@ namespace Myd.Platform.Demo
         {
             ctx.ClimbNoMoveTimer -= deltaTime;
             //处理跳跃
-            if (Input.Jump.Pressed() && true)
+            if (Input.Jump.Pressed() && (!ctx.Ducking || ctx.CanUnDuck))
             {
                 if (ctx.MoveX == -(int)ctx.Facing)
                     ctx.WallJump(-(int)ctx.Facing);
@@ -72,13 +78,15 @@ namespace Myd.Platform.Demo
                 //Climbed over ledge?
                 if (ctx.Speed.y < 0)
                 {
-                    //if (wallBoosting)
+                    //if (ctx.WallBoosting)
                     //{
-                    //    Speed += LiftBoost;
-                    //    Play(Sfxs.char_mad_grab_letgo);
+                        //    Speed += LiftBoost;
+                        //    Play(Sfxs.char_mad_grab_letgo);
                     //}
                     //else
-                    ClimbHop(); //自动翻越墙面
+                    {
+                        ClimbHop(); //自动翻越墙面
+                    }
                 }
 
                 return EActionState.Normal;
@@ -156,7 +164,7 @@ namespace Myd.Platform.Demo
                 ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, target, Constants.ClimbAccel * deltaTime);
             }
             //TrySlip导致的下滑在碰到底部的时候,停止下滑
-            if (ctx.MoveY != 1 && ctx.Speed.y < 0 && !ctx.CollideCheck(ctx.Position, new Vector2((int)ctx.Facing, -1)))
+            if (ctx.MoveY != -1 && ctx.Speed.y < 0 && !ctx.CollideCheck(ctx.Position, new Vector2((int)ctx.Facing, -1)))
             {
                 ctx.Speed.y = 0;
             }
@@ -193,7 +201,6 @@ namespace Myd.Platform.Demo
             ctx.Speed.y = Math.Max(ctx.Speed.y, Constants.ClimbHopY);
             ctx.ForceMoveX = 0;
             ctx.ForceMoveXTimer = Constants.ClimbHopForceTime;
-            //ctx.FastJump = false;
         } 
     }
 }
