@@ -52,10 +52,8 @@ namespace Myd.Platform.Demo
         private FiniteStateMachine<BaseActionState> stateMachine;
 
         private ControllerParams controllerParams;
-        private Player player;
-        public PlayerController(Player player, ControllerParams controllerParams)
+        public PlayerController(IPlayerContext context)
         {
-            this.player = player;
             ResetControllerParams(controllerParams);
 
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
@@ -81,14 +79,15 @@ namespace Myd.Platform.Demo
             this.Position = position;
             this.collider = normalHitbox;
 
-            Color color = NormalHairColor;
-            Gradient gradient = new Gradient();
-            gradient.SetKeys(
-                new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
-                new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
-            );
+            //TODO 初始化尾巴颜色
+            //Color color = NormalHairColor;
+            //Gradient gradient = new Gradient();
+            //gradient.SetKeys(
+            //    new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
+            //    new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
+            //);
 
-            this.player.SetTrailColor(gradient);
+            //this.player.SetTrailColor(gradient);
 
         }
 
@@ -229,53 +228,49 @@ namespace Myd.Platform.Demo
             
         }
 
-        private Color hairColor;
-        private float hairFlashTimer;
-        //Gradient gradient = new Gradient();
+        //private Color hairColor;
+        //private float hairFlashTimer;
+        ////Gradient gradient = new Gradient();
         
-        private void SetHairColor(Color color)
-        {
-            Gradient gradient = new Gradient();
-            gradient.SetKeys(
-                new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
-                new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
-            );
-            this.player.SetTrailColor(gradient);
-        }
-        private void UpdateHair(float deltaTime)
-        {
-            if (this.dashes == 0 && this.dashes < MaxDashes)
-            {
-                hairColor = Color.Lerp(hairColor, UsedHairColor, 6f * deltaTime);
-                SetHairColor(hairColor);
-            }
-            else
-            {
-                Color color;
-                if (this.lastDashes != this.dashes)
-                {
-                    color = FlashHairColor;
-                    hairFlashTimer = .12f;
-                }
-                else if (hairFlashTimer > 0)
-                {
-                    color = FlashHairColor;
-                    hairFlashTimer -= deltaTime;
-                }
-                else if (this.dashes == 2)
-                    color = Color.black;//TwoDashesHairColor;
-                else
-                    color = NormalHairColor;
+        //private void SetHairColor(Color color)
+        //{
+        //    Gradient gradient = new Gradient();
+        //    gradient.SetKeys(
+        //        new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
+        //        new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
+        //    );
+        //    this.player.SetTrailColor(gradient);
+        //}
+        //private void UpdateHair(float deltaTime)
+        //{
+        //    if (this.dashes == 0 && this.dashes < MaxDashes)
+        //    {
+        //        hairColor = Color.Lerp(hairColor, UsedHairColor, 6f * deltaTime);
+        //        SetHairColor(hairColor);
+        //    }
+        //    else
+        //    {
+        //        Color color;
+        //        if (this.lastDashes != this.dashes)
+        //        {
+        //            color = FlashHairColor;
+        //            hairFlashTimer = .12f;
+        //        }
+        //        else if (hairFlashTimer > 0)
+        //        {
+        //            color = FlashHairColor;
+        //            hairFlashTimer -= deltaTime;
+        //        }
+        //        else if (this.dashes == 2)
+        //            color = Color.black;//TwoDashesHairColor;
+        //        else
+        //            color = NormalHairColor;
 
-                this.hairColor = color;
-                SetHairColor(hairColor);
-            }
-            lastDashes = dashes;
-        }
-
-        public void Render()
-        {
-        }
+        //        this.hairColor = color;
+        //        SetHairColor(hairColor);
+        //    }
+        //    lastDashes = dashes;
+        //}
 
         //处理跳跃,跳跃时候，会给跳跃前方一个额外的速度
         public void Jump()

@@ -9,12 +9,11 @@ namespace Myd.Platform.Demo
         public bool UseCornerCorrection;
     }
 
-    //上下文数据，用于在多个组件间传递
-    public class PlayerContext
+    public interface IPlayerContext
     {
-        public Vector2 Speed;  //当前的移动速度
+
     }
-    public class Player : MonoBehaviour
+    public class Player : MonoBehaviour, IPlayerContext
     {
         [SerializeField]
         private SpriteRenderer spriteRenderer;
@@ -31,9 +30,7 @@ namespace Myd.Platform.Demo
         [Header("使用边界校正")]
         private bool UseCornerCorrection;
 
-        PlayerContext context;
         PlayerController controller;
-        PlayerRenderer renderer;
         
         public SpriteRenderer SpriteRenderer => this.spriteRenderer;
 
@@ -47,14 +44,11 @@ namespace Myd.Platform.Demo
 
         void Start()
         {
-            context = new PlayerContext();
-            controller = new PlayerController(this, new ControllerParams() { UseCornerCorrection= this.UseCornerCorrection });
+            Init();
+            controller = new PlayerController(this);
             controller.Init(this.transform.position);
-
-            renderer = new PlayerRenderer(this);
-            renderer.Init();
+            
             this.vfxJumpDust.Stop();
-
         }
 
         void Update()
@@ -67,18 +61,16 @@ namespace Myd.Platform.Demo
 
             //更新角色渲染器
             Render();
-            renderer.Update(Time.deltaTime);
         }
-
-        private bool lastFrameOnGround = false;
 
         private void Render()
         {
+            RenderSprite(Time.deltaTime);
+
             Vector2 scale = this.transform.localScale;
             scale.x = Mathf.Abs(scale.x) * (int)controller.Facing;
             this.transform.localScale = scale;
             this.transform.position = controller.Position;
-            //this.spriteRenderer.transform.localScale = controller.Scale;
 
             //if (!lastFrameOnGround && this.controller.OnGround)
             //{
@@ -106,20 +98,82 @@ namespace Myd.Platform.Demo
             this.vfxFallDust.Play();
         }
 
-        private void OnDrawGizmos()
-        {
-            if (controller == null)
-                return;
-            //Rect rect = new Rect(0, -0.25f, 0.8f, 1.1f);
-            //Gizmos.DrawLine(controller.Position + rect.position, controller.Position + rect.position + Vector2.right);
-
-            controller.Draw(EGizmoDrawType.SlipCheck);
-        }
-
         public void SetTrailColor(Gradient gradient)
         {
             trailRenderer.colorGradient = gradient;
         }
+
+        #region Renderer
+        public static Vector2 NORMAL_SPRITE_SCALE = Vector2.one;
+        public static Vector2 DUCK_SPRITE_SCALE = new Vector2(1F, 0.75f);
+
+        private Vector2 scale;
+        private Vector2 currSpriteScale = NORMAL_SPRITE_SCALE;
+
+        private void Init()
+        {
+            EventManager.Get().OnDuck += HandleOnDuck;
+            EventManager.Get().OnFall += HandleOnFall;
+            EventManager.Get().OnJump += HandleOnJump;
+            EventManager.Get().OnFallLand += HandleOnFallLand;
+        }
+
+        private void RenderSprite(float deltaTime)
+        {
+            float tempScaleX = Mathf.MoveTowards(scale.x, currSpriteScale.x, 1.75f * deltaTime);
+            float tempScaleY = Mathf.MoveTowards(scale.y, currSpriteScale.y, 1.75f * deltaTime);
+            this.scale = new Vector2(tempScaleX, tempScaleY);
+
+            this.spriteRenderer.transform.localScale = scale;
+
+            //处理Tail的效果
+        }
+
+        private void HandleOnDuck(bool enable)
+        {
+            if (enable)
+            {
+                this.scale = new Vector2(1.4f, .6f);
+                this.currSpriteScale = DUCK_SPRITE_SCALE;
+            }
+            else
+            {
+                this.scale = new Vector2(.8f, 1.2f);
+                this.currSpriteScale = NORMAL_SPRITE_SCALE;
+            }
+        }
+
+        private void HandleOnJump()
+        {
+            this.scale = new Vector2(.6f, 1.4f);
+
+            //this.player.PlayJumpEffect();
+
+            //蹬墙的粒子效果
+        }
+
+        //根据下落速度，进行缩放表现
+        private void HandleOnFall(float ySpeed)
+        {
+            float half = Constants.MaxFall + (Constants.FastMaxFall - Constants.MaxFall) * .5f;
+            if (ySpeed <= half)
+            {
+                float spriteLerp = Mathf.Min(1f, (ySpeed - half) / (Constants.FastMaxFall - half));
+                Vector2 scale = Vector2.zero;
+                scale.x = Mathf.Lerp(1f, 0.5f, spriteLerp);
+                scale.y = Mathf.Lerp(1f, 1.5f, spriteLerp);
+                this.scale = scale;
+            }
+        }
+
+        private void HandleOnFallLand(float ySpeed)
+        {
+            float squish = Mathf.Min(ySpeed / Mathf.Abs(Constants.FastMaxFall), 1);
+            float scaleX = Mathf.Lerp(1, 1.6f, squish);
+            float scaleY = Mathf.Lerp(1, 0.4f, squish);
+            this.scale = new Vector2(scaleX, scaleY);
+        }
+        #endregion
     }
 
     //测试用的绘制接口
