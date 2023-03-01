@@ -4,14 +4,18 @@ using UnityEngine;
 
 namespace Myd.Platform.Demo
 {
-
     public struct ControllerParams
     {
         public bool UseCornerCorrection;
     }
+
+    //上下文数据，用于在多个组件间传递
+    public class PlayerContext
+    {
+        public Vector2 Speed;  //当前的移动速度
+    }
     public class Player : MonoBehaviour
     {
-        PlayerController controller;
         [SerializeField]
         private SpriteRenderer spriteRenderer;
         [SerializeField]
@@ -27,6 +31,10 @@ namespace Myd.Platform.Demo
         [Header("使用边界校正")]
         private bool UseCornerCorrection;
 
+        PlayerContext context;
+        PlayerController controller;
+        PlayerRenderer renderer;
+        
         public SpriteRenderer SpriteRenderer => this.spriteRenderer;
 
         private void OnValidate()
@@ -39,19 +47,27 @@ namespace Myd.Platform.Demo
 
         void Start()
         {
+            context = new PlayerContext();
             controller = new PlayerController(this, new ControllerParams() { UseCornerCorrection= this.UseCornerCorrection });
             controller.Init(this.transform.position);
 
+            renderer = new PlayerRenderer(this);
+            renderer.Init();
             this.vfxJumpDust.Stop();
-            //trailRenderer.material = new Material(Shader.Find("Sprites/Default"));
 
         }
 
         void Update()
         {
+            //响应输入
             Input.Update(Time.deltaTime);
+
+            //更新角色控制器
             controller.Update(Time.deltaTime);
+
+            //更新角色渲染器
             Render();
+            renderer.Update(Time.deltaTime);
         }
 
         private bool lastFrameOnGround = false;
@@ -62,20 +78,20 @@ namespace Myd.Platform.Demo
             scale.x = Mathf.Abs(scale.x) * (int)controller.Facing;
             this.transform.localScale = scale;
             this.transform.position = controller.Position;
-            this.spriteRenderer.transform.localScale = controller.Scale;
+            //this.spriteRenderer.transform.localScale = controller.Scale;
 
-            if (!lastFrameOnGround && this.controller.OnGround)
-            {
-                this.vfxMoveDust.Play();
-            }
-            if (lastFrameOnGround && !this.controller.OnGround)
-                this.vfxMoveDust.Stop();
-            lastFrameOnGround = this.controller.OnGround;
+            //if (!lastFrameOnGround && this.controller.OnGround)
+            //{
+            //    this.vfxMoveDust.Play();
+            //}
+            //if (lastFrameOnGround && !this.controller.OnGround)
+            //    this.vfxMoveDust.Stop();
+            //lastFrameOnGround = this.controller.OnGround;
 
-            if (this.controller.IsFall)
-            {
-                PlayFallEffect();
-            }
+            //if (this.controller.IsFall)
+            //{
+            //    PlayFallEffect();
+            //}
         }
 
         public void PlayJumpEffect()

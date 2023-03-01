@@ -10,12 +10,15 @@ namespace Myd.Platform.Demo
         public float moveX;
         public float MoveY;
     }
+
+    /// <summary>
+    /// 玩家操作控制器
+    /// </summary>
     public partial class PlayerController
     {
         private const int MaxDashes = 1;    // 最大Dash次数
         private readonly int GroundMask;
 
-        Vector2 size;
         float jumpGraceTimer;
         float varJumpTimer;
         float varJumpSpeed; //
@@ -48,15 +51,12 @@ namespace Myd.Platform.Demo
 
         private FiniteStateMachine<BaseActionState> stateMachine;
 
-        public SpriteRenderer Renderer { get; set; }
         private ControllerParams controllerParams;
         private Player player;
         public PlayerController(Player player, ControllerParams controllerParams)
         {
             this.player = player;
             ResetControllerParams(controllerParams);
-            //TODO 临时方案
-            this.Renderer = player.SpriteRenderer;
 
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
             this.stateMachine.AddState(new NormalState(this));
@@ -226,11 +226,7 @@ namespace Myd.Platform.Demo
             //if (StateMachine.State != StDreamDash && StateMachine.State != StAttract)
             //    MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
 
-            //更新
-            UpdateSprite(deltaTime);
-
-
-            UpdateHair(deltaTime);
+            
         }
 
         private Color hairColor;
@@ -294,11 +290,7 @@ namespace Myd.Platform.Demo
             //Speed += LiftBoost;
             this.varJumpSpeed = this.Speed.y;
 
-            this.Scale = new Vector2(.6f, 1.4f);
-
-            this.player.PlayJumpEffect();
-
-            //蹬墙的粒子效果
+            EventManager.instance.FireOnJump();
         }
 
         //SuperJump，表示在地面上或者土狼时间内，Dash接跳跃。
@@ -330,8 +322,7 @@ namespace Myd.Platform.Demo
             //Speed += LiftBoost;
             varJumpSpeed = Speed.y;
 
-            this.Scale = new Vector2(.6f, 1.4f);
-
+            EventManager.instance.FireOnJump();
             //TODO，墙上的粒子效果。
         }
 
@@ -368,13 +359,7 @@ namespace Myd.Platform.Demo
             //Speed += LiftBoost;
             varJumpSpeed = Speed.y;
 
-            this.Scale = new Vector2(.6f, 1.4f);
-        }
-
-        //反弹
-        public  void Bounce(float flowY)
-        {
-
+            EventManager.instance.FireOnJump();
         }
 
         public bool RefillDash()
@@ -411,7 +396,6 @@ namespace Myd.Platform.Demo
         public float JumpGraceTimer => jumpGraceTimer;
 
         public Vector2 Position { get; private set; }
-        public Vector2 Scale { get; set; }
 
         //表示进入爬墙状态有0.1秒时间,不发生移动，为了让玩家看清发生了爬墙的动作
         public float ClimbNoMoveTimer { get; set; }
@@ -460,14 +444,13 @@ namespace Myd.Platform.Demo
                 if (value)
                 {
                     this.collider = this.duckHitbox;
-                    this.CurrSpriteScale = DUCK_SPRITE_SCALE;
                     return;
                 }
                 else
                 {
                     this.collider = this.normalHitbox;
-                    this.CurrSpriteScale = NORMAL_SPRITE_SCALE;
                 }
+                EventManager.Get().FireOnDuck(value);
             }
         }
 

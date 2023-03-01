@@ -38,11 +38,6 @@ namespace Myd.Platform.Demo
             //Climb
             if (Input.Grab.Checked() && !ctx.IsTired && !ctx.Ducking)
             {
-                //Grabbing Holdables
-                //foreach (Holdable hold in Scene.Tracker.GetComponents<Holdable>())
-                //    if (hold.Check(this) && Pickup(hold))
-                //        return StPickup;
-
                 //Climbing
                 if (ctx.Speed.y <= 0 && Math.Sign(ctx.Speed.x) != -(int)ctx.Facing)
                 {
@@ -51,26 +46,12 @@ namespace Myd.Platform.Demo
                         ctx.Ducking = false;
                         return EActionState.Climb;
                     }
-                    //TODO 考虑风场
-                    //if (Input.MoveY < 1 && level.Wind.Y <= 0)
-                    //{
-                    //    for (int i = 1; i <= ClimbUpCheckDist; i++)
-                    //    {
-                    //        if (!CollideCheck<Solid>(Position + Vector2.UnitY * -i) && ClimbCheck((int)Facing, -i))
-                    //        {
-                    //            MoveVExact(-i);
-                    //            Ducking = false;
-                    //            return StClimb;
-                    //        }
-                    //    }
-                    //}
                 }
             }
 
             //Dashing
             if (this.ctx.CanDash)
             {
-                //Speed += LiftBoost;
                 return this.ctx.Dash();
             }
 
@@ -82,7 +63,6 @@ namespace Myd.Platform.Demo
                     if (ctx.CanUnDuck)
                     {
                         ctx.Ducking = false;
-                        ctx.Scale = new Vector2(.8f, 1.2f);
                     }
                     else if (ctx.Speed.x == 0)
                     {
@@ -93,7 +73,7 @@ namespace Myd.Platform.Demo
             else if (ctx.OnGround && ctx.MoveY == -1 && ctx.Speed.y <= 0)
             {
                 ctx.Ducking = true;
-                ctx.Scale = new Vector2(1.4f, .6f);
+                EventManager.Get().FireOnDuck(true);
             }
 
             //水平面上移动,计算阻力
@@ -128,15 +108,7 @@ namespace Myd.Platform.Demo
                     {
                         this.ctx.MaxFall = Mathf.MoveTowards(this.ctx.MaxFall, fastMaxFallSpeed, Constants.FastMaxAccel * deltaTime);
 
-                        float half = maxFallSpeed + (fastMaxFallSpeed - maxFallSpeed) * .5f;
-                        if (this.ctx.Speed.y <= half)
-                        {
-                            float spriteLerp = Math.Min(1f, (this.ctx.Speed.y - half) / (fastMaxFallSpeed - half));
-                            Vector2 scale = Vector2.zero;
-                            scale.x = Mathf.Lerp(1f, 0.5f, spriteLerp);
-                            scale.y = Mathf.Lerp(1f, 1.5f, spriteLerp);
-                            this.ctx.Scale = scale;
-                        }
+                        EventManager.Get().FireOnFall(this.ctx.Speed.y);
                     }
                     else
                     {

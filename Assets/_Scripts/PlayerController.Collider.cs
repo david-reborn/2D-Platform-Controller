@@ -112,16 +112,13 @@ namespace Myd.Platform.Demo
                 }
                 distance = tempDist;
             }
-             
+
             //落地时候，进行缩放
             if (collided && distY < 0)
-            { 
+            {
                 if (this.stateMachine.State != (int)EActionState.Climb)
                 {
-                    float squish = Math.Min(speedY / Mathf.Abs(Constants.FastMaxFall), 1);
-                    float scaleX = Mathf.Lerp(1, 1.6f, squish);
-                    float scaleY = Mathf.Lerp(1, .4f, squish);
-                    this.Scale = new Vector2(scaleX, scaleY);
+                    EventManager.Get().FireOnFallLand(speedY);
                 }
             }
         }
