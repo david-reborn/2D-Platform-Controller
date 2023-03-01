@@ -20,7 +20,6 @@ namespace Myd.Platform.Demo
         private readonly Rect normalHurtbox = new Rect(0f, -0.15f, 0.8f, 0.9f);
         private readonly Rect duckHurtbox = new Rect(8f, 4f, 0.8f, 0.4f);
 
-
         private Rect collider;
 
         //碰撞检测
@@ -90,7 +89,7 @@ namespace Myd.Platform.Demo
             Vector2 targetPosition = this.Position;
             //使用校正
             float distance = distY;
-            int correctTimes = controllerParams.UseCornerCorrection ? 10 : 0;  //默认可以迭代位置10次
+            int correctTimes = 10; // int correctTimes = controllerParams.UseCornerCorrection ? 10 : 0;  //默认可以迭代位置10次
             bool collided = true;
             float speedY = Mathf.Abs(this.Speed.y);
             while (true)

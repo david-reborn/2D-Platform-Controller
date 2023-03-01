@@ -8,7 +8,7 @@ namespace Myd.Platform.Demo
 {
     public class NormalState : BaseActionState
     {
-        public NormalState(PlayerController context):base(EActionState.Normal, context)
+        public NormalState(PlayerController controller):base(EActionState.Normal, controller)
         {
         }
 
@@ -36,7 +36,7 @@ namespace Myd.Platform.Demo
         public override EActionState Update(float deltaTime)
         {
             //Climb
-            if (Input.Grab.Checked() && !ctx.IsTired && !ctx.Ducking)
+            if (Input.Grab.Checked() && !ctx.Ducking)
             {
                 //Climbing
                 if (ctx.Speed.y <= 0 && Math.Sign(ctx.Speed.x) != -(int)ctx.Facing)

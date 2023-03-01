@@ -16,7 +16,6 @@ namespace Myd.Platform.Demo
     /// </summary>
     public partial class PlayerController
     {
-        private const int MaxDashes = 1;    // 最大Dash次数
         private readonly int GroundMask;
 
         float jumpGraceTimer;
@@ -51,10 +50,9 @@ namespace Myd.Platform.Demo
 
         private FiniteStateMachine<BaseActionState> stateMachine;
 
-        private ControllerParams controllerParams;
         public PlayerController(IPlayerContext context)
         {
-            ResetControllerParams(controllerParams);
+            Reload(context);
 
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
             this.stateMachine.AddState(new NormalState(this));
@@ -62,13 +60,15 @@ namespace Myd.Platform.Demo
             this.stateMachine.AddState(new ClimbState(this));
             this.GroundMask = LayerMask.GetMask("Ground");
 
+            this.Facing  = Facings.Right;
             this.LastAim = Vector2.right;
-            this.Facing = Facings.Right;
+            
         }
 
-        public void ResetControllerParams(ControllerParams controllerParams)
+        public void Reload(IPlayerContext context)
         {
-            this.controllerParams = controllerParams;
+            //启用或者禁用功能组件或特性
+
         }
 
         public void Init(Vector2 position)
@@ -127,8 +127,6 @@ namespace Myd.Platform.Demo
                 //After Dash
                 if (this.onGround && this.stateMachine.State != (int)EActionState.Climb)
                 {
-                    //AutoJump = false;
-                    //Stamina = ClimbMaxStamina;
                     this.WallSlideTimer = Constants.WallSlideTime;
                 }
 
@@ -219,13 +217,7 @@ namespace Myd.Platform.Demo
             //更新位置
             UpdateCollideX(Speed.x * deltaTime);
             UpdateCollideY(Speed.y * deltaTime);
-            //Physics
-            //if (StateMachine.State != StDreamDash && StateMachine.State != StAttract)
-            //    MoveH(Speed.X * Engine.DeltaTime, onCollideH);
-            //if (StateMachine.State != StDreamDash && StateMachine.State != StAttract)
-            //    MoveV(Speed.Y * Engine.DeltaTime, onCollideV);
 
-            
         }
 
         //private Color hairColor;
@@ -359,9 +351,9 @@ namespace Myd.Platform.Demo
 
         public bool RefillDash()
         {
-            if (this.dashes < MaxDashes)
+            if (this.dashes < Constants.MaxDashes)
             {
-                this.dashes = MaxDashes;
+                this.dashes = Constants.MaxDashes;
                 return true;
             }
             else
@@ -446,18 +438,6 @@ namespace Myd.Platform.Demo
                     this.collider = this.normalHitbox;
                 }
                 EventManager.Get().FireOnDuck(value);
-            }
-        }
-
-        public bool IsTired
-        {
-            get
-            {
-                return false;
-            }
-            set
-            {
-
             }
         }
 

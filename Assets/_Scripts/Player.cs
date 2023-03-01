@@ -11,7 +11,6 @@ namespace Myd.Platform.Demo
 
     public interface IPlayerContext
     {
-
     }
     public class Player : MonoBehaviour, IPlayerContext
     {
@@ -25,22 +24,8 @@ namespace Myd.Platform.Demo
         private ParticleSystem vfxJumpDust;
         [SerializeField]
         private ParticleSystem vfxFallDust;
-        [Tooltip("参数")]
-        [SerializeField]
-        [Header("使用边界校正")]
-        private bool UseCornerCorrection;
 
-        PlayerController controller;
-        
-        public SpriteRenderer SpriteRenderer => this.spriteRenderer;
-
-        private void OnValidate()
-        {
-            if (controller == null)
-                return;
-            Debug.Log("==刷新控制器参数");
-            controller.ResetControllerParams(new ControllerParams() { UseCornerCorrection = this.UseCornerCorrection });
-        }
+        private PlayerController controller;
 
         void Start()
         {

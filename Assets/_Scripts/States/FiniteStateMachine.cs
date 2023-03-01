@@ -95,9 +95,7 @@ namespace Myd.Platform.Demo
                 this.states[this.currState].OnBegin();
                 if (this.states[this.currState].IsCoroutine())
                 {
-                    Debug.Log(44444);
                     this.currentCoroutine.Replace(this.states[this.currState].Coroutine());
-                    Debug.Log(55555);
                     return;
                 }
                 this.currentCoroutine.Cancel();

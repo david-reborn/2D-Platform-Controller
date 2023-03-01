@@ -94,7 +94,6 @@ namespace Myd.Platform.Demo
 
         public override IEnumerator Coroutine()
         {
-            Debug.Log(11111);
             yield return null;
             //
             var dir = ctx.LastAim;
@@ -111,7 +110,6 @@ namespace Myd.Platform.Demo
 
             CreateTrail();
             ctx.DashTrailTimer = .08f;
-            Debug.Log(22222);
             yield return Constants.DashTime;
             CreateTrail();
             if (this.DashDir.y >= 0)
@@ -123,7 +121,6 @@ namespace Myd.Platform.Demo
             if (ctx.Speed.y > 0)
                 ctx.Speed.y *= Constants.EndDashUpMult;
 
-            Debug.Log(33333);
             this.ctx.SetState((int)EActionState.Normal);
         }
 
