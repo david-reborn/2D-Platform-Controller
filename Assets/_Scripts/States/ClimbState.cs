@@ -30,7 +30,7 @@ namespace Myd.Platform.Demo
             ctx.Speed.x = 0;
             ctx.Speed.y *= Constants.ClimbGrabYMult;
             //TODO 其他参数
-            ctx.WallSlideTimer = Constants.WallSlideTime;
+            ctx.WallSlide?.ResetTime();
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
             //两个像素的吸附功能

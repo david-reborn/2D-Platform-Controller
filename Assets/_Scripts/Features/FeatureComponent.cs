@@ -8,6 +8,9 @@ namespace Myd.Platform.Demo
     /// </summary>
     public class FeatureComponent : MonoBehaviour
     {
+        [Header("启用功能【墙壁下滑】")]
+        public bool EnableWallSlide;
+
         [Header("水平方向参数")]
         [Tooltip("最大水平速度")]
         public int MaxRun;
@@ -91,7 +94,7 @@ namespace Myd.Platform.Demo
 
         public void OnValidate()
         {
-            Debug.Log("=======更新参数");
+            Debug.Log("=======更新所有配置参数");
             Constants.MaxRun = MaxRun;
             Constants.RunAccel = RunAccel;
             Constants.RunReduce = RunReduce;
@@ -129,6 +132,9 @@ namespace Myd.Platform.Demo
             Constants.ClimbHopForceTime = ClimbHopForceTime;    //Hop时间
             Constants.ClimbJumpBoostTime = ClimbJumpBoostTime;   //WallBoost时间
             Constants.ClimbHopNoWindTime = ClimbHopNoWindTime;   //Wind情况下,Hop会无风0.3秒
+
+            Constants.EnableWallSlide = this.EnableWallSlide; //启用墙壁下滑功能
+            this.GetComponent<Player>().RefreshAbility();
         }
     }
 

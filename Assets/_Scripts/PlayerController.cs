@@ -32,11 +32,9 @@ namespace Myd.Platform.Demo
         private float wallSpeedRetentionTimer; // If you hit a wall, start this timer. If coast is clear within this timer, retain h-speed
         private float wallSpeedRetained;
 
-        public float WallSlideTimer { get; set; } = Constants.WallSlideTime;
-        public int WallSlideDir { get; set; }
-
         private bool onGround;
         private bool wasOnGround;
+
 
         public int ForceMoveX { get; set; }
         public float ForceMoveXTimer { get; set; }
@@ -48,11 +46,12 @@ namespace Myd.Platform.Demo
         public int wallBoostDir;
         public float wallBoostTimer;   // If you climb jump and then do a sideways input within this timer, switch to wall jump
 
+        public WallSlide WallSlide { get; set; }
         private FiniteStateMachine<BaseActionState> stateMachine;
 
         public PlayerController(IPlayerContext context)
         {
-            Reload(context);
+            RefreshAbility(context);
 
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
             this.stateMachine.AddState(new NormalState(this));
@@ -62,13 +61,19 @@ namespace Myd.Platform.Demo
 
             this.Facing  = Facings.Right;
             this.LastAim = Vector2.right;
-            
         }
 
-        public void Reload(IPlayerContext context)
+        public void RefreshAbility(IPlayerContext context)
         {
             //启用或者禁用功能组件或特性
-
+            if (!Constants.EnableWallSlide)
+            {
+                this.WallSlide = null;
+            }
+            else
+            {
+                this.WallSlide = this.WallSlide == null ? new WallSlide(this) : this.WallSlide;
+            }
         }
 
         public void Init(Vector2 position)
@@ -105,13 +110,12 @@ namespace Myd.Platform.Demo
                 {
                     this.onGround = false;
                 }
-                //TODO Highest Air Y
-                //TODO Flashing
+
                 //Wall Slide
-                if (this.WallSlideDir != 0)
+                if (this.WallSlide != null)
                 {
-                    this.WallSlideTimer = Math.Max(this.WallSlideTimer - deltaTime, 0);
-                    this.WallSlideDir = 0;
+                    this.WallSlide.Update(deltaTime);
+                    this.WallSlide.Check(this.onGround, this.stateMachine.State != (int)EActionState.Climb);
                 }
 
                 //Wall Boost, 不消耗体力WallJump
@@ -124,13 +128,7 @@ namespace Myd.Platform.Demo
                         wallBoostTimer = 0;
                     }
                 }
-                //After Dash
-                if (this.onGround && this.stateMachine.State != (int)EActionState.Climb)
-                {
-                    this.WallSlideTimer = Constants.WallSlideTime;
-                }
-
-                //Dash Attack
+                
 
                 //Jump Grace
                 if (OnGround)
@@ -144,20 +142,6 @@ namespace Myd.Platform.Demo
                     {
                         jumpGraceTimer -= deltaTime;
                     }
-                }
-
-                //撞墙以后的速度保持，Wall Speed Retention
-                if (wallSpeedRetentionTimer > 0)
-                {
-                    if (Math.Sign(Speed.x) == -Math.Sign(wallSpeedRetained))
-                        wallSpeedRetentionTimer = 0;
-                    else if (!CollideCheck(Position, Vector2.right * Math.Sign(wallSpeedRetained)))
-                    {
-                        Speed.x = wallSpeedRetained;
-                        wallSpeedRetentionTimer = 0;
-                    }
-                    else
-                        wallSpeedRetentionTimer -= deltaTime;
                 }
 
                 //Dash
@@ -197,7 +181,22 @@ namespace Myd.Platform.Demo
                 {
                     Facing = (Facings)moveX;
                 }
+                //Aiming
                 LastAim = Input.GetAimVector(Facing);
+
+                //撞墙以后的速度保持，Wall Speed Retention，用于撞开
+                if (wallSpeedRetentionTimer > 0)
+                {
+                    if (Math.Sign(Speed.x) == -Math.Sign(wallSpeedRetained))
+                        wallSpeedRetentionTimer = 0;
+                    else if (!CollideCheck(Position, Vector2.right * Math.Sign(wallSpeedRetained)))
+                    {
+                        Speed.x = wallSpeedRetained;
+                        wallSpeedRetentionTimer = 0;
+                    }
+                    else
+                        wallSpeedRetentionTimer -= deltaTime;
+                }
 
                 //Hop Wait X
                 if (this.HopWaitX != 0)
@@ -269,7 +268,7 @@ namespace Myd.Platform.Demo
         {
             Input.Jump.ConsumeBuffer();
             this.jumpGraceTimer = 0;
-            this.WallSlideTimer = Constants.WallSlideTime;
+            this.WallSlide?.ResetTime();
 
             this.varJumpTimer = Constants.VarJumpTime;
             this.Speed.x += Constants.JumpHBoost * moveX;
@@ -295,7 +294,7 @@ namespace Myd.Platform.Demo
             Ducking = false;
             jumpGraceTimer = 0;
             varJumpTimer = Constants.VarJumpTime;
-            WallSlideTimer = Constants.WallSlideTime;
+            this.WallSlide?.ResetTime();
             //WallBoostTimer = 0;
             if (moveX != 0)
             {
@@ -337,7 +336,7 @@ namespace Myd.Platform.Demo
             Ducking = false;
             jumpGraceTimer = 0;
             varJumpTimer = Constants.SuperWallJumpVarTime;
-            WallSlideTimer = Constants.WallSlideTime;
+            this.WallSlide?.ResetTime();
             //WallBoostTimer = 0;
 
             //TODO 考虑电梯对速度的加成
@@ -359,6 +358,9 @@ namespace Myd.Platform.Demo
             else
                 return false;
         }
+
+        
+        
 
         #region 实现IPlayerContext接口
         public bool CanDash
@@ -464,4 +466,8 @@ namespace Myd.Platform.Demo
             }
         }
     }
+
+    #region WallSlide
+    
+    #endregion
 }

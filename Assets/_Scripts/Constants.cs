@@ -9,6 +9,10 @@ namespace Myd.Platform.Demo
     //这里涉及坐标的数值需要/10, 除时间类型
     public static class Constants
     {
+
+        public static bool EnableWallSlide = true;
+
+
         public static float Gravity = 90f; //重力
 
         public static float HalfGravThreshold = 4f;

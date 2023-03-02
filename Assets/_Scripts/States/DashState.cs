@@ -18,8 +18,7 @@ namespace Myd.Platform.Demo
 
         public override void OnBegin()
         {
-            ctx.WallSlideTimer = Constants.WallSlideTime;
-
+            ctx.WallSlide?.ResetTime();
             ctx.DashCooldownTimer = Constants.DashCooldown;
             beforeDashSpeed = ctx.Speed;
             ctx.Speed = Vector2.zero;

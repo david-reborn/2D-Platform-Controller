@@ -120,29 +120,10 @@ namespace Myd.Platform.Demo
                 {
                     float max = this.ctx.MaxFall;//最大下落速度
                     //Wall Slide
-                    if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && Input.Grab.Checked())) && ctx.MoveY != -1)
+                    if (ctx.WallSlide != null)
                     {
-                        //判断是否向下做Wall滑行
-                        if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck)
-                        {
-                            ctx.Ducking = false;
-                            ctx.WallSlideDir = (int)ctx.Facing;
-                        }
-
-                        if (ctx.WallSlideDir != 0)
-                        {
-                            //if (ctx.WallSlideTimer > Constants.WallSlideTime * 0.5f && ClimbBlocker.Check(level, this, Position + Vector2.UnitX * wallSlideDir))
-                            //    ctx.WallSlideTimer = Constants.WallSlideTime * .5f;
-
-                            max = Mathf.Lerp(Constants.MaxFall, Constants.WallSlideStartMax, ctx.WallSlideTimer / Constants.WallSlideTime);
-                            if ((ctx.WallSlideTimer / Constants.WallSlideTime) > .65f)
-                            {
-                                //TODO 播放特效
-                                //CreateWallSlideParticles(wallSlideDir);
-                            }
-                        }
+                        max = ctx.WallSlide.AdjustMaxFall(max);
                     }
-
                     float mult = (Math.Abs(ctx.Speed.y) < Constants.HalfGravThreshold && (Input.Jump.Checked())) ? .5f : 1f;
                     //空中的情况,需要计算Y轴速度
                     ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, max, Constants.Gravity * mult * deltaTime);

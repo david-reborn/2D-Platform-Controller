@@ -123,7 +123,10 @@ namespace Myd.Platform.Demo
             }
             else
             {
-                this.scale = new Vector2(.8f, 1.2f);
+                if (this.controller.OnGround && controller.MoveY != 1)
+                {
+                    this.scale = new Vector2(.8f, 1.2f);
+                }
                 this.currSpriteScale = NORMAL_SPRITE_SCALE;
             }
         }
@@ -157,6 +160,15 @@ namespace Myd.Platform.Demo
             float scaleX = Mathf.Lerp(1, 1.6f, squish);
             float scaleY = Mathf.Lerp(1, 0.4f, squish);
             this.scale = new Vector2(scaleX, scaleY);
+        }
+        #endregion
+
+
+
+        #region 刷新角色能力列表
+        public void RefreshAbility()
+        {
+            this.controller?.RefreshAbility(this);
         }
         #endregion
     }
