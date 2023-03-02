@@ -10,6 +10,11 @@ namespace Myd.Platform.Demo
     {
         [Header("启用功能【墙壁下滑】")]
         public bool EnableWallSlide;
+        [Header("启用功能【土狼时间】")]
+        public bool EnableJumpGrace;
+        [Header("启用功能【WallBoost】")]
+        [Tooltip("一个可以不消耗耐力的技巧")]
+        public bool EnableWallBoost;
 
         [Header("水平方向参数")]
         [Tooltip("最大水平速度")]
@@ -22,7 +27,8 @@ namespace Myd.Platform.Demo
         [Header("竖直方向参数")]
         [Tooltip("重力加速度")]
         public float Gravity = 90f; //重力
-        [Tooltip("当速度小于该阈值时，重力减半。值越小，滞空时间越长")]
+        [Tooltip("当速度小于该阈值时，重力减半。值越小，滞空时间越长，0表示关闭")]
+        [Range(0,9)]
         public float HalfGravThreshold = 4f;
         [Tooltip("下落的最大速度（带方向，向上为正）")]
         public float MaxFall = -16; //普通最大下落速度
@@ -133,7 +139,13 @@ namespace Myd.Platform.Demo
             Constants.ClimbJumpBoostTime = ClimbJumpBoostTime;   //WallBoost时间
             Constants.ClimbHopNoWindTime = ClimbHopNoWindTime;   //Wind情况下,Hop会无风0.3秒
 
+            Constants.WallJumpHSpeed = MaxRun + JumpHBoost;
+            Constants.SuperJumpSpeed = JumpSpeed;
+            Constants.SuperWallJumpH = MaxRun + JumpHBoost * 2;
+
             Constants.EnableWallSlide = this.EnableWallSlide; //启用墙壁下滑功能
+            Constants.EnableJumpGrace = this.EnableJumpGrace; //土狼时间
+            Constants.EnableWallBoost = this.EnableWallBoost; //WallBoost
             this.GetComponent<Player>().RefreshAbility();
         }
     }

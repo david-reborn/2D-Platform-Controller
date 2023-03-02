@@ -106,7 +106,7 @@ namespace Myd.Platform.Demo
                 correctTimes--;
                 if (!Correct(tempDist))
                 {
-                    this.Speed.y = 0;//校正失败，则速度清零
+                    this.Speed.y = 0;//未完成校正，则速度清零
                     break;
                 }
                 distance = tempDist;

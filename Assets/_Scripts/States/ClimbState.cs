@@ -27,10 +27,12 @@ namespace Myd.Platform.Demo
 
         public override void OnBegin()
         {
+            
             ctx.Speed.x = 0;
             ctx.Speed.y *= Constants.ClimbGrabYMult;
             //TODO 其他参数
             ctx.WallSlide?.ResetTime();
+            ctx.WallBoost?.ResetTime();
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
             //两个像素的吸附功能

@@ -29,6 +29,7 @@ namespace Myd.Platform.Demo
 
         public override void OnEnd()
         {
+            this.ctx.WallBoost?.ResetTime();
             this.ctx.WallSpeedRetentionTimer = 0;
             this.ctx.HopWaitX = 0;
         }
@@ -108,6 +109,7 @@ namespace Myd.Platform.Demo
                     {
                         this.ctx.MaxFall = Mathf.MoveTowards(this.ctx.MaxFall, fastMaxFallSpeed, Constants.FastMaxAccel * deltaTime);
 
+                        //处理表现
                         EventManager.Get().FireOnFall(this.ctx.Speed.y);
                     }
                     else
@@ -145,7 +147,7 @@ namespace Myd.Platform.Demo
             if (Input.Jump.Pressed())
             {
                 //土狼时间范围内,允许跳跃
-                if (this.ctx.JumpGraceTimer > 0)
+                if (this.ctx.JumpCheck.AllowJump())
                 {
                     this.ctx.Jump();
                 }else if (ctx.CanUnDuck)

@@ -46,7 +46,7 @@ namespace Myd.Platform.Demo
             if (DashDir.y == 0)
             {
                 //Super Jump
-                if (ctx.CanUnDuck && Input.Jump.Pressed() && ctx.JumpGraceTimer > 0)
+                if (ctx.CanUnDuck && Input.Jump.Pressed() && ctx.JumpCheck.AllowJump())
                 {
                     ctx.SuperJump();
                     return EActionState.Normal;

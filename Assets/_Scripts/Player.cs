@@ -164,7 +164,6 @@ namespace Myd.Platform.Demo
         #endregion
 
 
-
         #region 刷新角色能力列表
         public void RefreshAbility()
         {

@@ -11,11 +11,12 @@ namespace Myd.Platform.Demo
     {
 
         public static bool EnableWallSlide = true;
-
+        public static bool EnableJumpGrace = true;
+        public static bool EnableWallBoost = true;
 
         public static float Gravity = 90f; //重力
 
-        public static float HalfGravThreshold = 4f;
+        public static float HalfGravThreshold = 4f; //滞空时间阈值
         public static float MaxFall = -16; //普通最大下落速度
         public static float FastMaxFall = -24f;  //快速最大下落速度
         public static float FastMaxAccel = 30f; //快速下落加速度
@@ -98,7 +99,7 @@ namespace Myd.Platform.Demo
         #endregion
 
         #region Corner Correct
-        public static float UpwardCornerCorrection = 4f; //向上移动，X轴上边缘校正的最大距离
+        public static int UpwardCornerCorrection = 4; //向上移动，X轴上边缘校正的最大距离
         #endregion
     }
 }

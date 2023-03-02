@@ -18,7 +18,6 @@ namespace Myd.Platform.Demo
     {
         private readonly int GroundMask;
 
-        float jumpGraceTimer;
         float varJumpTimer;
         float varJumpSpeed; //
         int moveX;
@@ -42,11 +41,9 @@ namespace Myd.Platform.Demo
         public int HopWaitX;   // If you climb hop onto a moving solid, snap to beside it until you get above it
         public float HopWaitXSpeed;
 
-        public bool WallBoosting;
-        public int wallBoostDir;
-        public float wallBoostTimer;   // If you climb jump and then do a sideways input within this timer, switch to wall jump
-
-        public WallSlide WallSlide { get; set; }
+        public WallSlide WallSlide { get; set; }    //WallSlide
+        public JumpCheck JumpCheck { get; set; }    //土狼时间
+        public WallBoost WallBoost { get; set; }    //WallBoost
         private FiniteStateMachine<BaseActionState> stateMachine;
 
         public PlayerController(IPlayerContext context)
@@ -73,6 +70,17 @@ namespace Myd.Platform.Demo
             else
             {
                 this.WallSlide = this.WallSlide == null ? new WallSlide(this) : this.WallSlide;
+            }
+
+            this.JumpCheck = new JumpCheck(this, Constants.EnableJumpGrace);
+
+            if (!Constants.EnableWallBoost)
+            {
+                this.WallBoost = null;
+            }
+            else
+            {
+                this.WallBoost = this.WallBoost == null ? new WallBoost(this) : this.WallBoost;
             }
         }
 
@@ -119,30 +127,10 @@ namespace Myd.Platform.Demo
                 }
 
                 //Wall Boost, 不消耗体力WallJump
-                if (wallBoostTimer > 0)
-                {
-                    wallBoostTimer -= deltaTime;
-                    if (moveX == wallBoostDir)
-                    {
-                        this.Speed.x = Constants.WallJumpHSpeed * moveX;
-                        wallBoostTimer = 0;
-                    }
-                }
+                this.WallBoost?.Update(deltaTime);
                 
-
-                //Jump Grace
-                if (OnGround)
-                {
-                    //dreamJump = false;
-                    jumpGraceTimer = Constants.JumpGraceTime;
-                }
-                else
-                {
-                    if (jumpGraceTimer > 0)
-                    {
-                        jumpGraceTimer -= deltaTime;
-                    }
-                }
+                //跳跃检查
+                this.JumpCheck?.Update(deltaTime);
 
                 //Dash
                 {
@@ -267,9 +255,9 @@ namespace Myd.Platform.Demo
         public void Jump()
         {
             Input.Jump.ConsumeBuffer();
-            this.jumpGraceTimer = 0;
+            this.JumpCheck?.ResetTime();
             this.WallSlide?.ResetTime();
-
+            this.WallBoost?.ResetTime();
             this.varJumpTimer = Constants.VarJumpTime;
             this.Speed.x += Constants.JumpHBoost * moveX;
             this.Speed.y = Constants.JumpSpeed;
@@ -292,10 +280,10 @@ namespace Myd.Platform.Demo
         {
             Input.Jump.ConsumeBuffer();
             Ducking = false;
-            jumpGraceTimer = 0;
+            this.JumpCheck?.ResetTime();
             varJumpTimer = Constants.VarJumpTime;
             this.WallSlide?.ResetTime();
-            //WallBoostTimer = 0;
+            this.WallBoost?.ResetTime();
             if (moveX != 0)
             {
                 this.ForceMoveX = dir;
@@ -322,11 +310,7 @@ namespace Myd.Platform.Demo
                 //Input.Rumble(RumbleStrength.Light, RumbleLength.Medium);
             }
             Jump();
-            if (moveX == 0)
-            {
-                this.wallBoostDir = -(int)Facing;
-                this.wallBoostTimer = Constants.ClimbJumpBoostTime;
-            }
+            WallBoost?.Active();
         }
 
         //在墙边Dash时，当前按住上，不按左右时，执行SuperWallJump
@@ -334,10 +318,10 @@ namespace Myd.Platform.Demo
         {
             Input.Jump.ConsumeBuffer();
             Ducking = false;
-            jumpGraceTimer = 0;
+            this.JumpCheck?.ResetTime();
             varJumpTimer = Constants.SuperWallJumpVarTime;
             this.WallSlide?.ResetTime();
-            //WallBoostTimer = 0;
+            this.WallBoost?.ResetTime();
 
             //TODO 考虑电梯对速度的加成
             Speed.x = Constants.SuperWallJumpH * dir;
@@ -381,8 +365,6 @@ namespace Myd.Platform.Demo
         public object Holding => null;
 
         public bool OnGround => this.onGround;
-
-        public float JumpGraceTimer => jumpGraceTimer;
 
         public Vector2 Position { get; private set; }
 
