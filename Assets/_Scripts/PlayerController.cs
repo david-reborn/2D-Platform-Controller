@@ -441,6 +441,20 @@ namespace Myd.Platform.Demo
             }
         }
 
+        public bool DuckFreeAt(Vector2 at)
+        {
+            Vector2 oldP = Position;
+            Rect oldC = this.collider;
+            Position = at;
+            this.collider = duckHitbox;
+
+            bool ret = !CollideCheck(this.Position, Vector2.zero);
+
+            this.Position = oldP;
+            this.collider = oldC;
+
+            return ret;
+        }
         public bool IsFall
         {
             get

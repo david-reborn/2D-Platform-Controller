@@ -5623,9 +5623,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b6c88293e3853c4390338c2afc35870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnableWallSlide: 0
-  EnableJumpGrace: 0
-  EnableWallBoost: 0
+  EnableWallSlide: 1
+  EnableJumpGrace: 1
+  EnableWallBoost: 1
   MaxRun: 9
   RunAccel: 100
   RunReduce: 40

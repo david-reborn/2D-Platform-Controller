@@ -25,7 +25,7 @@ namespace Myd.Platform.Demo
         //碰撞检测
         public bool CollideCheck(Vector2 position, Vector2 dir, float dist = 0)
         {
-            Vector2 origion = this.Position + collider.position;
+            Vector2 origion = position + collider.position;
             return Physics2D.OverlapBox(origion + dir * (dist + DEVIATION), collider.size, 0, GroundMask);
         }
 
@@ -56,32 +56,64 @@ namespace Myd.Platform.Demo
         //根据碰撞调整X轴上的最终移动距离
         protected void UpdateCollideX(float distX)
         {
-            if (distX == 0)
-                return;
-            //目标位置
-            Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
+            //if (distX == 0)
+            //    return;
+            ////目标位置
+            //Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
+            //Vector2 targetPosition = this.Position;
+
+            //Vector2 origion = this.Position + collider.position;
+
+            //RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
+            //if (hit)
+            //{
+            //    //如果发生碰撞,则移动距离
+            //    targetPosition += direct * (hit.distance - DEVIATION);
+            //    //Speed retention
+            //    //if (wallSpeedRetentionTimer <= 0)
+            //    //{
+            //    //    wallSpeedRetained = this.speed.x;
+            //    //    wallSpeedRetentionTimer = Constants.WallSpeedRetentionTime;
+            //    //}
+            //    this.Speed.x = 0;
+            //}
+            //else
+            //{
+            //    targetPosition += Vector2.right * distX;
+            //}
+            //this.Position = targetPosition;
             Vector2 targetPosition = this.Position;
-
-            Vector2 origion = this.Position + collider.position;
-
-            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
-            if (hit)
+            //使用校正
+            float distance = distX;
+            int correctTimes = 1;
+            bool collided = true;
+            float speedY = Mathf.Abs(this.Speed.y);
+            while (true)
             {
-                //如果发生碰撞,则移动距离
-                targetPosition += direct * (hit.distance - DEVIATION);
-                //Speed retention
-                //if (wallSpeedRetentionTimer <= 0)
-                //{
-                //    wallSpeedRetained = this.speed.x;
-                //    wallSpeedRetentionTimer = Constants.WallSpeedRetentionTime;
-                //}
-                this.Speed.x = 0;
+                float moved = MoveXStepWithCollide(distance);
+                //无碰撞退出循环
+                this.Position += Vector2.right * moved;
+                if (moved == distance || correctTimes == 0) //无碰撞，且校正次数为0
+                {
+                    collided = false;
+                    break;
+                }
+                float tempDist = distance - moved;
+                correctTimes--;
+                if (!CorrectX(tempDist))
+                {
+                    this.Speed.x = 0;//未完成校正，则速度清零
+
+                    //Speed retention
+                    if (wallSpeedRetentionTimer <= 0)
+                    {
+                        wallSpeedRetained = this.Speed.x;
+                        wallSpeedRetentionTimer = Constants.WallSpeedRetentionTime;
+                    }
+                    break;
+                }
+                distance = tempDist;
             }
-            else
-            {
-                targetPosition += Vector2.right * distX;
-            }
-            this.Position = targetPosition;
         }
 
         protected void UpdateCollideY(float distY)
@@ -104,7 +136,7 @@ namespace Myd.Platform.Demo
                 }
                 float tempDist = distance - moved;
                 correctTimes--;
-                if (!Correct(tempDist))
+                if (!CorrectY(tempDist))
                 {
                     this.Speed.y = 0;//未完成校正，则速度清零
                     break;
@@ -205,7 +237,55 @@ namespace Myd.Platform.Demo
             return moved.y;
         }
 
-        private bool Correct(float distY)
+        private float MoveXStepWithCollide(float distX)
+        {
+            Vector2 moved = Vector2.zero;
+            Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
+            Vector2 origion = this.Position + collider.position;
+            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
+            if (hit && hit.normal == -direct)
+            {
+                //如果发生碰撞,则移动距离
+                moved += direct * Mathf.Max((hit.distance - DEVIATION), 0);
+            }
+            else
+            {
+                moved += Vector2.right * distX;
+            }
+            return moved.x;
+        }
+
+        private bool CorrectX(float distX)
+        {
+            Vector2 origion = this.Position + collider.position;
+            Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
+
+            if ((this.stateMachine.State == (int)EActionState.Dash))
+            {
+                if (onGround && DuckFreeAt(Position + Vector2.right * distX))
+                {
+                    Ducking = true;
+                    return true;
+                }
+                else if (this.Speed.y == 0 && this.Speed.x!=0)
+                {
+                    for (int i = 1; i <= Constants.DashCornerCorrection; i++)
+                    {
+                        for (int j = 1; j >= -1; j -= 2)
+                        {
+                            if (!CollideCheck(this.Position + new Vector2(0, j * i * 0.1f), direct, Mathf.Abs(distX)))
+                            {
+                                this.Position += new Vector2(distX, j * i * 0.1f);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool CorrectY(float distY)
         {
             Vector2 origion = this.Position + collider.position;
             Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
