@@ -89,7 +89,7 @@ namespace Myd.Platform.Demo
             Vector2 targetPosition = this.Position;
             //使用校正
             float distance = distY;
-            int correctTimes = 10; // int correctTimes = controllerParams.UseCornerCorrection ? 10 : 0;  //默认可以迭代位置10次
+            int correctTimes = 1; // int correctTimes = controllerParams.UseCornerCorrection ? 10 : 0;  //默认可以迭代位置10次
             bool collided = true;
             float speedY = Mathf.Abs(this.Speed.y);
             while (true)
@@ -121,11 +121,15 @@ namespace Myd.Platform.Demo
                 }
             }
         }
-
-        //针对横向,进行碰撞检测.如果发生碰撞,
         private bool CheckGround()
         {
-            Vector2 origion = this.Position + collider.position;
+            return CheckGround(Vector2.zero);
+        }
+
+        //针对横向,进行碰撞检测.如果发生碰撞,
+        private bool CheckGround(Vector2 offset)
+        {
+            Vector2 origion = this.Position + collider.position + offset;
             Collider2D hit = Physics2D.OverlapBox(origion + Vector2.down * DEVIATION, collider.size, 0, GroundMask);
             if (hit)
             {
@@ -205,10 +209,40 @@ namespace Myd.Platform.Demo
         {
             Vector2 origion = this.Position + collider.position;
             Vector2 direct = Math.Sign(distY) > 0 ? Vector2.up : Vector2.down;
-            //向上移动
-            if (this.Speed.y > 0)
+            
+            if (this.Speed.y < 0)
             {
-                //Corner Correction
+                if ((this.stateMachine.State == (int)EActionState.Dash) && !DashStartedOnGround)
+                {
+                    if (this.Speed.x <= 0)
+                    {
+                        for (int i = -1; i >= -Constants.DashCornerCorrection; i--)
+                        {
+                            if (!CheckGround(new Vector2(i*0.1f, 0)))
+                            {
+                                this.Position += new Vector2(i * 0.1f, distY);
+                                return true;
+                            }
+                        }
+                    }
+
+                    if (this.Speed.x >= 0)
+                    {
+                        for (int i = 1; i <= Constants.DashCornerCorrection; i++)
+                        {
+                            if (!CheckGround(new Vector2(i * 0.1f, 0)))
+                            {
+                                this.Position += new Vector2(i * 0.1f, distY);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            //向上移动
+            else if (this.Speed.y > 0)
+            {
+                //Y轴向上方向的Corner Correction
                 {
                     if (this.Speed.x <= 0)
                     {

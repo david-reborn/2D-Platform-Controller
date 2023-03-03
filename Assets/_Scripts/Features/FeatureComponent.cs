@@ -62,8 +62,8 @@ namespace Myd.Platform.Demo
         public float DashCooldown = .2f;         //冲刺冷却时间，
         [Tooltip("冲刺重新装填时间")]
         public float DashRefillCooldown = .1f;   //冲刺重新装填时间
-        [Tooltip("Dashs水平方向位置校正的像素值")]
-        public int DashCornerCorrection = 4;     //水平Dash时，遇到阻挡物的可纠正像素值
+        [Tooltip("Dashs水平或者竖直方向位置校正的像素值")]
+        public int DashCornerCorrection = 4;     //Dash时，遇到阻挡物的可纠正距离，单位0.1米
         [Tooltip("最大Dash次数")]
         public int MaxDashes = 1;    // 最大Dash次数
 
@@ -142,6 +142,8 @@ namespace Myd.Platform.Demo
             Constants.WallJumpHSpeed = MaxRun + JumpHBoost;
             Constants.SuperJumpSpeed = JumpSpeed;
             Constants.SuperWallJumpH = MaxRun + JumpHBoost * 2;
+
+            Constants.DashCornerCorrection = this.DashCornerCorrection;
 
             Constants.EnableWallSlide = this.EnableWallSlide; //启用墙壁下滑功能
             Constants.EnableJumpGrace = this.EnableJumpGrace; //土狼时间

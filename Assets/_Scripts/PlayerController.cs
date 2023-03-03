@@ -33,7 +33,8 @@ namespace Myd.Platform.Demo
 
         private bool onGround;
         private bool wasOnGround;
-
+        
+        public bool DashStartedOnGround { get; set; }
 
         public int ForceMoveX { get; set; }
         public float ForceMoveXTimer { get; set; }

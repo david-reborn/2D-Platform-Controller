@@ -24,6 +24,7 @@ namespace Myd.Platform.Demo
             ctx.Speed = Vector2.zero;
             DashDir = Vector2.zero;
             ctx.DashTrailTimer = 0;
+            ctx.DashStartedOnGround = ctx.OnGround;
         }
 
         public override void OnEnd()
