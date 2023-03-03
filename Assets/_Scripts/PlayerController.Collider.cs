@@ -46,7 +46,7 @@ namespace Myd.Platform.Demo
             //    return false;
 
             //获取当前的碰撞体
-            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * dir * DEVIATION , collider.size, 0, GroundMask))
+            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * dir * (Constants.ClimbCheckDist * 0.1f + DEVIATION), collider.size, 0, GroundMask))
             {
                 return true;
             }
@@ -56,32 +56,6 @@ namespace Myd.Platform.Demo
         //根据碰撞调整X轴上的最终移动距离
         protected void UpdateCollideX(float distX)
         {
-            //if (distX == 0)
-            //    return;
-            ////目标位置
-            //Vector2 direct = Math.Sign(distX) > 0 ? Vector2.right : Vector2.left;
-            //Vector2 targetPosition = this.Position;
-
-            //Vector2 origion = this.Position + collider.position;
-
-            //RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, direct, Mathf.Abs(distX) + DEVIATION, GroundMask);
-            //if (hit)
-            //{
-            //    //如果发生碰撞,则移动距离
-            //    targetPosition += direct * (hit.distance - DEVIATION);
-            //    //Speed retention
-            //    //if (wallSpeedRetentionTimer <= 0)
-            //    //{
-            //    //    wallSpeedRetained = this.speed.x;
-            //    //    wallSpeedRetentionTimer = Constants.WallSpeedRetentionTime;
-            //    //}
-            //    this.Speed.x = 0;
-            //}
-            //else
-            //{
-            //    targetPosition += Vector2.right * distX;
-            //}
-            //this.Position = targetPosition;
             Vector2 targetPosition = this.Position;
             //使用校正
             float distance = distX;
@@ -352,6 +326,11 @@ namespace Myd.Platform.Demo
                 }
             }
             return false;
+        }
+
+        public void MoveExactY(float distY)
+        {
+            CorrectY(distY);
         }
     }
 }

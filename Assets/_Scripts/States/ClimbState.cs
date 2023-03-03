@@ -36,11 +36,17 @@ namespace Myd.Platform.Demo
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
             //两个像素的吸附功能
-            //for (int i = 0; i < ClimbCheckDist; i++)
-            //    if (!CollideCheck<Solid>(Position + Vector2.UnitX * (int)Facing))
-            //        Position += Vector2.UnitX * (int)Facing;
-            //    else
-            //        break;
+            for (int i = 0; i < Constants.ClimbCheckDist; i++)
+            { 
+                if (!ctx.CollideCheck(ctx.Position, Vector2.right))
+                {
+                    ctx.AdjustPosition(Vector2.right * 0.1f);
+                }
+                else
+                {
+                    break;
+                }
+            }
             //TODO 表现
         }
 
