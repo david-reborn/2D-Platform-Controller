@@ -18,22 +18,18 @@ namespace Myd.Platform.Demo
         private SpriteRenderer spriteRenderer;
         [SerializeField]
         private TrailRenderer trailRenderer;
-        [SerializeField]
-        private ParticleSystem vfxMoveDust;
-        [SerializeField]
-        private ParticleSystem vfxJumpDust;
-        [SerializeField]
-        private ParticleSystem vfxFallDust;
 
         private PlayerController controller;
 
+        private bool lastFrameOnGround;
+
+        private SceneEffectManager sceneEffect;
+        private Color groundColor;
         void Start()
         {
             Init();
             controller = new PlayerController(this);
             controller.Init(this.transform.position);
-            
-            this.vfxJumpDust.Stop();
         }
 
         void Update()
@@ -57,30 +53,18 @@ namespace Myd.Platform.Demo
             this.transform.localScale = scale;
             this.transform.position = controller.Position;
 
-            //if (!lastFrameOnGround && this.controller.OnGround)
-            //{
-            //    this.vfxMoveDust.Play();
-            //}
-            //if (lastFrameOnGround && !this.controller.OnGround)
-            //    this.vfxMoveDust.Stop();
-            //lastFrameOnGround = this.controller.OnGround;
+            
+            if (!lastFrameOnGround && this.controller.OnGround)
+            {
+                this.sceneEffect.PlayMoveEffect(true, this.controller.GroundColor);
+            }
+            else if (lastFrameOnGround && !this.controller.OnGround)
+            {
+                this.sceneEffect.PlayMoveEffect(false, this.controller.GroundColor);
+            }
+            this.sceneEffect.UpdateMoveEffect(this.transform.position - Vector3.up * 0.8f);
 
-            //if (this.controller.IsFall)
-            //{
-            //    PlayFallEffect();
-            //}
-        }
-
-        public void PlayJumpEffect()
-        {
-            this.vfxJumpDust.transform.position = this.spriteRenderer.transform.position;
-            this.vfxJumpDust.Play();
-        }
-
-        public void PlayFallEffect()
-        {
-            this.vfxFallDust.transform.position = this.spriteRenderer.transform.position;
-            this.vfxFallDust.Play();
+            this.lastFrameOnGround = this.controller.OnGround;
         }
 
         public void SetTrailColor(Gradient gradient)
@@ -101,6 +85,9 @@ namespace Myd.Platform.Demo
             EventManager.Get().OnFall += HandleOnFall;
             EventManager.Get().OnJump += HandleOnJump;
             EventManager.Get().OnFallLand += HandleOnFallLand;
+
+            this.sceneEffect = SceneEffectManager.instance;
+            this.sceneEffect.RestAllEffect();
         }
 
         private void RenderSprite(float deltaTime)
@@ -135,7 +122,7 @@ namespace Myd.Platform.Demo
         {
             this.scale = new Vector2(.6f, 1.4f);
 
-            //this.player.PlayJumpEffect();
+            this.sceneEffect.PlayJumpEffect(this.spriteRenderer.transform.position);
 
             //蹬墙的粒子效果
         }
@@ -160,6 +147,8 @@ namespace Myd.Platform.Demo
             float scaleX = Mathf.Lerp(1, 1.6f, squish);
             float scaleY = Mathf.Lerp(1, 0.4f, squish);
             this.scale = new Vector2(scaleX, scaleY);
+
+            this.sceneEffect.PlayLandEffect(this.spriteRenderer.transform.position);
         }
         #endregion
 

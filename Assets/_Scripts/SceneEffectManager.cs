@@ -11,6 +11,14 @@ namespace Myd.Platform.Demo
         [SerializeField]
         private TrailSnapshot trailSnapshotPrefab;
 
+
+        [SerializeField]
+        private ParticleSystem vfxMoveDust;
+        [SerializeField]
+        private ParticleSystem vfxJumpDust;
+        [SerializeField]
+        private ParticleSystem vfxLandDust;
+
         private TrailSnapshot[] snapshots = new TrailSnapshot[64];
 
         public void Awake()
@@ -44,6 +52,45 @@ namespace Myd.Platform.Demo
         public void SetSnapshot(int index, TrailSnapshot snapshot)
         {
             this.snapshots[index] = snapshot;
+        }
+
+        public void PlayMoveEffect(bool play, Color color)
+        {
+            if (play)
+            {
+                ParticleSystem.MainModule settings = this.vfxMoveDust.GetComponent<ParticleSystem>().main;
+                settings.startColor = new ParticleSystem.MinMaxGradient(color);
+                this.vfxMoveDust.Play();
+            }
+            else
+            {
+                this.vfxMoveDust.Stop();
+            }
+        }
+
+        public void UpdateMoveEffect(Vector3 position)
+        {
+            this.vfxMoveDust.transform.position = position;
+            
+        }
+
+        public void PlayJumpEffect(Vector3 position)
+        {
+            this.vfxJumpDust.transform.position = position;//this.spriteRenderer.transform.position;
+            this.vfxJumpDust.Play();
+        }
+
+        public void PlayLandEffect(Vector3 position)
+        {
+            this.vfxLandDust.transform.position = position;//this.spriteRenderer.transform.position;
+            this.vfxLandDust.Play();
+        }
+
+        public void RestAllEffect()
+        {
+            this.vfxMoveDust.Play();
+            this.vfxJumpDust.Stop();
+            this.vfxLandDust.Stop();
         }
     }
 

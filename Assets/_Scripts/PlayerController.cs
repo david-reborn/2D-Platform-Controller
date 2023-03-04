@@ -366,7 +366,8 @@ namespace Myd.Platform.Demo
         public object Holding => null;
 
         public bool OnGround => this.onGround;
-
+        private Color groundColor = Color.white;
+        public Color GroundColor => this.groundColor;
         public Vector2 Position { get; private set; }
         //表示进入爬墙状态有0.1秒时间,不发生移动，为了让玩家看清发生了爬墙的动作
         public float ClimbNoMoveTimer { get; set; }
