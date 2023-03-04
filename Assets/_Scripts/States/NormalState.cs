@@ -47,18 +47,14 @@ namespace Myd.Platform.Demo
                         ctx.Ducking = false;
                         return EActionState.Climb;
                     }
-                    if (ctx.MoveY > 1)
+                    //非下坠情况，需要考虑向上攀爬吸附
+                    if (ctx.MoveY > -1)
                     {
-                        for (int i = 1; i <= Constants.ClimbUpCheckDist; i++)
+                        bool snapped = ctx.ClimbUpSnap();
+                        if (snapped)
                         {
-                            //检测上方是否存在可以攀爬的墙壁，如果存在则瞬移i个像素
-                            if (!ctx.CollideCheck(ctx.Position, Vector2.up, i * 0.1f) && ctx.ClimbCheck((int)ctx.Facing, i))
-                            {
-                                Debug.Log("======Climb Correct");
-                                ctx.MoveExactY(i);
-                                ctx.Ducking = false;
-                                return EActionState.Climb;
-                            }
+                            ctx.Ducking = false;
+                            return EActionState.Climb;
                         }
                     }
                 }

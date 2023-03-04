@@ -27,7 +27,6 @@ namespace Myd.Platform.Demo
 
         public override void OnBegin()
         {
-            
             ctx.Speed.x = 0;
             ctx.Speed.y *= Constants.ClimbGrabYMult;
             //TODO 其他参数
@@ -36,17 +35,7 @@ namespace Myd.Platform.Demo
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
             //两个像素的吸附功能
-            for (int i = 0; i < Constants.ClimbCheckDist; i++)
-            { 
-                if (!ctx.CollideCheck(ctx.Position, Vector2.right))
-                {
-                    ctx.AdjustPosition(Vector2.right * 0.1f);
-                }
-                else
-                {
-                    break;
-                }
-            }
+            ctx.ClimbSnap();
             //TODO 表现
         }
 

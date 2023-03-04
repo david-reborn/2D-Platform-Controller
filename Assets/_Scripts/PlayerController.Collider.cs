@@ -22,6 +22,13 @@ namespace Myd.Platform.Demo
 
         private Rect collider;
 
+
+        public void AdjustPosition(Vector2 adjust)
+        {
+            UpdateCollideX(adjust.x);
+            UpdateCollideY(adjust.y);
+        }
+
         //碰撞检测
         public bool CollideCheck(Vector2 position, Vector2 dir, float dist = 0)
         {
@@ -35,21 +42,14 @@ namespace Myd.Platform.Demo
         }
 
         //攀爬检查
-        public bool ClimbCheck(int dir, int yAdd = 0)
+        public bool ClimbCheck(int dir, float yAdd = 0)
         {
-            //检查在关卡范围内
-            //if (!this.ClimbBoundsCheck(dir))
-            //    return false;
-
-            //且前面两个单元没有ClimbBlock
-            //if (ClimbBlocker.Check(base.Scene, this, this.Position + Vector2.UnitY * (float)yAdd + Vector2.UnitX * 2f * (float)this.Facing))
-            //    return false;
-
             //获取当前的碰撞体
-            if (Physics2D.OverlapBox(this.Position + Vector2.up * (float)yAdd + Vector2.right * dir * (Constants.ClimbCheckDist * 0.1f + DEVIATION), collider.size, 0, GroundMask))
+            Vector2 origion = this.Position + collider.position;
+            if (Physics2D.OverlapBox(origion + Vector2.up * (float)yAdd + Vector2.right * dir * (Constants.ClimbCheckDist * 0.1f + DEVIATION), collider.size, 0, GroundMask))
             {
                 return true;
-            }
+            } 
             return false;
         }
 
@@ -60,8 +60,6 @@ namespace Myd.Platform.Demo
             //使用校正
             float distance = distX;
             int correctTimes = 1;
-            bool collided = true;
-            float speedY = Mathf.Abs(this.Speed.y);
             while (true)
             {
                 float moved = MoveXStepWithCollide(distance);
@@ -69,7 +67,6 @@ namespace Myd.Platform.Demo
                 this.Position += Vector2.right * moved;
                 if (moved == distance || correctTimes == 0) //无碰撞，且校正次数为0
                 {
-                    collided = false;
                     break;
                 }
                 float tempDist = distance - moved;
@@ -136,8 +133,8 @@ namespace Myd.Platform.Demo
         private bool CheckGround(Vector2 offset)
         {
             Vector2 origion = this.Position + collider.position + offset;
-            Collider2D hit = Physics2D.OverlapBox(origion + Vector2.down * DEVIATION, collider.size, 0, GroundMask);
-            if (hit)
+            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, Vector2.down, DEVIATION, GroundMask);
+            if (hit && hit.normal == Vector2.up)
             {
                 return true;
             }
@@ -272,9 +269,11 @@ namespace Myd.Platform.Demo
                     {
                         for (int i = -1; i >= -Constants.DashCornerCorrection; i--)
                         {
-                            if (!CheckGround(new Vector2(i*0.1f, 0)))
+                            float step = (Mathf.Abs(i * 0.1f) + DEVIATION);
+                            
+                            if (!CheckGround(new Vector2(-step, 0)))
                             {
-                                this.Position += new Vector2(i * 0.1f, distY);
+                                this.Position += new Vector2(-step, distY);
                                 return true;
                             }
                         }
@@ -284,9 +283,10 @@ namespace Myd.Platform.Demo
                     {
                         for (int i = 1; i <= Constants.DashCornerCorrection; i++)
                         {
-                            if (!CheckGround(new Vector2(i * 0.1f, 0)))
+                            float step = (Mathf.Abs(i * 0.1f) + DEVIATION);
+                            if (!CheckGround(new Vector2(step, 0)))
                             {
-                                this.Position += new Vector2(i * 0.1f, distY);
+                                this.Position += new Vector2(step, distY);
                                 return true;
                             }
                         }
@@ -328,9 +328,51 @@ namespace Myd.Platform.Demo
             return false;
         }
 
-        public void MoveExactY(float distY)
+        //攀爬时，向上吸附
+        public bool ClimbUpSnap()
         {
-            CorrectY(distY);
+            for (int i = 1; i <= Constants.ClimbUpCheckDist; i++)
+            {
+                //检测上方是否存在可以攀爬的墙壁，如果存在则瞬移i个像素
+                float yOffset = i * 0.1f;
+                if (!CollideCheck(this.Position, Vector2.up, yOffset) && ClimbCheck((int)Facing, yOffset + DEVIATION))
+                {
+                    this.Position += Vector2.up * yOffset;
+                    Debug.Log($"======Climb Correct");
+                    return true;
+                }
+            }
+            return false;
         }
+
+        //攀爬水平方向上的吸附
+        public void ClimbSnap()
+        {
+            Vector2 origion = this.Position + collider.position;
+            Vector2 dir = Vector2.right * (int)this.Facing;
+            RaycastHit2D hit = Physics2D.BoxCast(origion, collider.size, 0, dir, Constants.ClimbCheckDist*0.1f + DEVIATION, GroundMask);
+            if (hit)
+            {
+                //如果发生碰撞,则移动距离
+                this.Position += dir * Mathf.Max((hit.distance - DEVIATION), 0);
+            }
+            //for (int i = 0; i < Constants.ClimbCheckDist; i++)
+            //{
+            //    Vector2 dir = Vector2.right * (int)ctx.Facing;
+            //    if (!ctx.CollideCheck(ctx.Position, dir))
+            //    {
+            //        ctx.AdjustPosition(dir * 0.1f);
+            //    }
+            //    else
+            //    {
+            //        break;
+            //    }
+            //}
+        }
+
+        //public void MoveExactY(float distY)
+        //{
+        //    CorrectY(distY);
+        //}
     }
 }

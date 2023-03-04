@@ -5638,6 +5638,7 @@ MonoBehaviour:
   VarJumpTime: 0.2
   JumpHBoost: 4
   JumpGraceTime: 0.1
+  UpwardCornerCorrection: 4
   DashSpeed: 24
   EndDashSpeed: 16
   EndDashUpMult: 0.75

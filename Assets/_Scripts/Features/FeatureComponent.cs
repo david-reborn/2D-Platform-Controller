@@ -47,7 +47,8 @@ namespace Myd.Platform.Demo
         public float JumpHBoost = 4f;
         [Tooltip("土狼时间（离开平台时，还能响应跳跃的时间）")]
         public float JumpGraceTime = 0.1f;
-
+        [Tooltip("向上运动遇到障碍的左右校正像素")]
+        public int UpwardCornerCorrection = 4;
 
         [Header("Dash冲刺参数")]
         [Tooltip("开始冲刺初速度")]
@@ -109,6 +110,8 @@ namespace Myd.Platform.Demo
             Constants.MaxFall = MaxFall; //普通最大下落速度
             Constants.FastMaxFall = FastMaxFall;  //快速最大下落速度
             Constants.FastMaxAccel = FastMaxAccel; //快速下落加速度
+
+            Constants.UpwardCornerCorrection = UpwardCornerCorrection;
 
             Constants.JumpSpeed = JumpSpeed;
             Constants.VarJumpTime = VarJumpTime;

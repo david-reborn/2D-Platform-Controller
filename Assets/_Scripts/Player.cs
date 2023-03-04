@@ -176,5 +176,6 @@ namespace Myd.Platform.Demo
     public enum EGizmoDrawType
     {
         SlipCheck,
+        ClimbCheck,
     }
 }
