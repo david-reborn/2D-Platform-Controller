@@ -30,6 +30,7 @@ namespace Myd.Platform.Demo
         public override void OnEnd()
         {
             //CallDashEvents();
+            ctx.OnChangeDashState(DashDir, false);
         }
 
         public override EActionState Update(float deltaTime)
@@ -87,7 +88,6 @@ namespace Myd.Platform.Demo
                     }
                 }
             }
-
             return state;
         }
 
@@ -108,7 +108,10 @@ namespace Myd.Platform.Demo
             if (DashDir.x != 0)
                 ctx.Facing = (Facings)Math.Sign(DashDir.x);
 
+            ctx.OnChangeDashState(DashDir, true);
             //TODO Dash Slide
+
+            ctx.OnDash(dir);
 
             CreateTrail();
             ctx.DashTrailTimer = .08f;

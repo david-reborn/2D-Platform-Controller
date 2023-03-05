@@ -11,6 +11,9 @@ namespace Myd.Platform.Demo
 
     public interface IPlayerContext
     {
+        void OnDash(Vector3 position, Vector2 dir);
+
+        void OnChangeDashState(Vector2 dir, bool enable);
     }
     public class Player : MonoBehaviour, IPlayerContext
     {
@@ -85,7 +88,6 @@ namespace Myd.Platform.Demo
             EventManager.Get().OnFall += HandleOnFall;
             EventManager.Get().OnJump += HandleOnJump;
             EventManager.Get().OnFallLand += HandleOnFallLand;
-
             this.sceneEffect = SceneEffectManager.instance;
             this.sceneEffect.RestAllEffect();
         }
@@ -150,6 +152,16 @@ namespace Myd.Platform.Demo
 
             this.sceneEffect.PlayLandEffect(this.spriteRenderer.transform.position);
         }
+
+        public void OnDash(Vector3 position, Vector2 dir)
+        {
+            this.sceneEffect.PlayDashEffect(position, dir);
+        }
+
+        public void OnChangeDashState(Vector2 dir, bool enable)
+        {
+            this.sceneEffect.PlayDashFluxEffect(dir, enable);
+        }
         #endregion
 
 
@@ -158,6 +170,7 @@ namespace Myd.Platform.Demo
         {
             this.controller?.RefreshAbility(this);
         }
+
         #endregion
     }
 

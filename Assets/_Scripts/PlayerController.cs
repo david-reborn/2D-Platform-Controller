@@ -47,8 +47,10 @@ namespace Myd.Platform.Demo
         public WallBoost WallBoost { get; set; }    //WallBoost
         private FiniteStateMachine<BaseActionState> stateMachine;
 
+        private IPlayerContext context;
         public PlayerController(IPlayerContext context)
         {
+            this.context = context;
             RefreshAbility(context);
 
             this.stateMachine = new FiniteStateMachine<BaseActionState>((int)EActionState.Size);
@@ -480,9 +482,17 @@ namespace Myd.Platform.Demo
                 return !this.wasOnGround && this.OnGround;
             }
         }
+
+
+        public void OnDash(Vector2 dir)
+        {
+            this.context.OnDash(this.Position, dir);
+        }
+
+        public void OnChangeDashState(Vector2 dir, bool enable)
+        {
+            this.context.OnChangeDashState(dir, enable);
+        }
     }
 
-    #region WallSlide
-    
-    #endregion
 }
