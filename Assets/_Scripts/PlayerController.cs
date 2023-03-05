@@ -271,9 +271,27 @@ namespace Myd.Platform.Demo
         //SuperJump，表示在地面上或者土狼时间内，Dash接跳跃。
         //数值方便和Jump类似，数值变大。
         //蹲伏状态的SuperJump需要额外处理。
+        //Dash->Jump->Dush
         public void SuperJump()
         {
-            
+            Input.Jump.ConsumeBuffer();
+            this.JumpCheck?.ResetTime();
+            varJumpTimer = Constants.VarJumpTime;
+            this.WallSlide?.ResetTime();
+            this.WallBoost?.ResetTime();
+
+            this.Speed.x = Constants.SuperJumpH * (int)Facing;
+            this.Speed.y = Constants.JumpSpeed;
+            //Speed += LiftBoost;
+            if (Ducking)
+            {
+                Ducking = false;
+                this.Speed.x *= Constants.DuckSuperJumpXMult;
+                this.Speed.y *= Constants.DuckSuperJumpYMult;
+            }
+            varJumpSpeed = Speed.y;
+            varJumpSpeed = Speed.y;
+            EventManager.instance.FireOnJump();
         }
 
         //在墙边情况下的，跳跃。主要需要考虑当前跳跃朝向

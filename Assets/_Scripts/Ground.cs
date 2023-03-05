@@ -15,10 +15,7 @@ public class Ground : MonoBehaviour
             Vector3Int cell = tilemap.WorldToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
             TileBase tile = tilemap.GetTile(cell);
             Debug.Log(tile.name);
-            
         }
-
-
     }
 
     private void SetTileColour(Color colour, Vector3Int position, Tilemap tilemap)

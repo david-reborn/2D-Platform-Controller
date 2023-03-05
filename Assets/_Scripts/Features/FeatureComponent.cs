@@ -99,6 +99,10 @@ namespace Myd.Platform.Demo
         [Tooltip("Wind情况下,Hop会无风0.3秒")]
         public float ClimbHopNoWindTime = .3f;   //Wind情况下,Hop会无风0.3秒
 
+        public float DuckFriction = 50f;
+        public float DuckSuperJumpXMult = 1.25f;
+        public float DuckSuperJumpYMult = 0.5f;
+
         public void OnValidate()
         {
             Debug.Log("=======更新所有配置参数");
@@ -147,6 +151,10 @@ namespace Myd.Platform.Demo
             Constants.SuperWallJumpH = MaxRun + JumpHBoost * 2;
 
             Constants.DashCornerCorrection = this.DashCornerCorrection;
+
+            Constants.DuckFriction = DuckFriction;
+            Constants.DuckSuperJumpXMult = DuckSuperJumpXMult;
+            Constants.DuckSuperJumpYMult = DuckSuperJumpYMult;
 
             Constants.EnableWallSlide = this.EnableWallSlide; //启用墙壁下滑功能
             Constants.EnableJumpGrace = this.EnableJumpGrace; //土狼时间

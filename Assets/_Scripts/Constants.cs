@@ -96,6 +96,8 @@ namespace Myd.Platform.Demo
 
         #region Duck参数
         public static float DuckFriction = 50f;
+        public static float DuckSuperJumpXMult = 1.25f;
+        public static float DuckSuperJumpYMult = .5f;
         #endregion
 
         #region Corner Correct
