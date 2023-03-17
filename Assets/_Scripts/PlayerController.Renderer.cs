@@ -18,6 +18,10 @@ namespace Myd.Platform.Demo
         public Color FlashHairColor = Color.white;
 
 
+        public void CreateTrail()
+        {
+            this.context.CreateTrail();
+        }
         ////处理缩放
         //private void UpdateSprite(float deltaTime)
         //{

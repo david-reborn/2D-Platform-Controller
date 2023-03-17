@@ -136,7 +136,7 @@ namespace Myd.Platform.Demo
 
         private void CreateTrail()
         {
-            //SceneEffectManager.instance.Add(ctx, Color.white);
+            ctx.CreateTrail();
         }
     }
 }

@@ -20,8 +20,6 @@ namespace Myd.Platform.Demo
         public delegate void Jump();
         public event Jump OnJump;
 
-        
-
         public static EventManager instance;
 
         public static EventManager Get()

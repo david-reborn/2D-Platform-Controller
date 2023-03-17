@@ -34,12 +34,11 @@ namespace Myd.Platform.Demo
             SceneEffectManager.instance = this;
         }
 
-        //public void Add(PlayerController player, Color color, float duration = 1f, bool frozenUpdate = false, bool useRawDeltaTime = false)
-        //{
-        //    Vector2 scale = player.Renderer.transform.localScale;
-        //    //Vector2 scale = new Vector2(playerSprite.Scale.x * (int)player.Facing, playerSprite.Scale.y);
-        //    Add(player.Renderer.transform.position, player.Renderer.sprite, scale, (int)player.Facing, color, 2, duration, frozenUpdate, useRawDeltaTime);
-        //}
+        public void Add(SpriteRenderer renderer, int facing, Color color, float duration = 1f, bool frozenUpdate = false, bool useRawDeltaTime = false)
+        {
+            Vector2 scale = renderer.transform.localScale;
+            Add(renderer.transform.position, renderer.sprite, scale, facing, color, 2, duration, frozenUpdate, useRawDeltaTime);
+        }
 
         private TrailSnapshot Add(Vector2 position, Sprite sprite, Vector2 scale, int facing, Color color,
                 int depth, float duration = 1f, bool frozenUpdate = false, bool useRawDeltaTime = false)

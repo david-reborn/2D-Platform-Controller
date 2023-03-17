@@ -14,6 +14,8 @@ namespace Myd.Platform.Demo
         void OnDash(Vector3 position, Vector2 dir);
 
         void OnChangeDashState(Vector2 dir, bool enable);
+
+        void CreateTrail();
     }
     public class Player : MonoBehaviour, IPlayerContext
     {
@@ -169,6 +171,11 @@ namespace Myd.Platform.Demo
         public void RefreshAbility()
         {
             this.controller?.RefreshAbility(this);
+        }
+
+        public void CreateTrail()
+        {
+            this.sceneEffect.Add(this.spriteRenderer, (int)this.controller.Facing, Color.white);
         }
 
         #endregion
