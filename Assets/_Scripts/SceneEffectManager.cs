@@ -22,6 +22,11 @@ namespace Myd.Platform.Demo
         private ParticleSystem vfxDashLine;
         [SerializeField]
         private ParticleSystem vfxDashFlux;
+        [SerializeField]
+        private RippleEffect vfxRippleEffect;
+        [SerializeField]
+        private DashImpulse vfxDashImpulse;
+
         private TrailSnapshot[] snapshots = new TrailSnapshot[64];
 
         public void Awake()
@@ -94,8 +99,11 @@ namespace Myd.Platform.Demo
             this.vfxDashLine.transform.position = position;
             this.vfxDashLine.transform.rotation = Quaternion.FromToRotation(Vector2.up, dir);
             this.vfxDashLine.Play();
-        }
 
+            this.vfxRippleEffect.Ripple(position);
+
+            this.vfxDashImpulse.Shake(dir);
+        }
 
         public void PlayDashFluxEffect(Vector2 dir, bool play)
         {
