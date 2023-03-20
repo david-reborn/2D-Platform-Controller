@@ -131,7 +131,6 @@ namespace Myd.Platform.Demo
             Constants.DashCornerCorrection = DashCornerCorrection;     //水平Dash时，遇到阻挡物的可纠正像素值
             Constants.MaxDashes = MaxDashes;    // 最大Dash次数
 
-
             Constants.ClimbCheckDist = ClimbCheckDist;           //攀爬检查像素值
             Constants.ClimbUpCheckDist = ClimbUpCheckDist;         //向上攀爬检查像素值
             Constants.ClimbNoMoveTime = ClimbNoMoveTime;

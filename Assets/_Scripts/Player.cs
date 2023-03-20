@@ -21,8 +21,6 @@ namespace Myd.Platform.Demo
     {
         [SerializeField]
         private SpriteRenderer spriteRenderer;
-        [SerializeField]
-        private TrailRenderer trailRenderer;
 
         private PlayerController controller;
 
@@ -70,11 +68,6 @@ namespace Myd.Platform.Demo
             this.sceneEffect.UpdateMoveEffect(this.transform.position - Vector3.up * 0.8f);
 
             this.lastFrameOnGround = this.controller.OnGround;
-        }
-
-        public void SetTrailColor(Gradient gradient)
-        {
-            trailRenderer.colorGradient = gradient;
         }
 
         #region Renderer
