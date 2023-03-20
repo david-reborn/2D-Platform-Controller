@@ -21,9 +21,6 @@ namespace Myd.Platform.Demo
         [Header("头巾挂载节点")]
         private Transform HeadMount;
 
-        [SerializeField]
-        private Color color;
-
         private void Awake()
         {
             

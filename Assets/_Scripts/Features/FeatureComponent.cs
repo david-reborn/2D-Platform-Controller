@@ -139,7 +139,7 @@ namespace Myd.Platform.Demo
             Constants.ClimbSlipSpeed = ClimbSlipSpeed;       //下滑速度
             Constants.ClimbAccel = ClimbAccel;          //下滑加速度
             Constants.ClimbGrabYMult = ClimbGrabYMult;       //攀爬时抓取导致的Y轴速度衰减
-            Constants.ClimbHopY = ClimbHopY;          //Hop的Y轴速度
+            Constants.ClimbHopY = ClimbHopY;          //Hop的Y轴速度 
             Constants.ClimbHopX = ClimbHopX;           //Hop的X轴速度
             Constants.ClimbHopForceTime = ClimbHopForceTime;    //Hop时间
             Constants.ClimbJumpBoostTime = ClimbJumpBoostTime;   //WallBoost时间
