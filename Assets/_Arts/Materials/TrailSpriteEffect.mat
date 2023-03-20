@@ -87,5 +87,5 @@ Material:
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _HitEffectColor: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TrailColor: {r: 0.23921569, g: 0.59607846, b: 0.8980392, a: 1}
+    - _TrailColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
   m_BuildTextureStacks: []
