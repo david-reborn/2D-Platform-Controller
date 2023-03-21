@@ -2,7 +2,7 @@
 using Myd.Common;
 using UnityEngine;
 
-namespace Myd.Platform.Demo
+namespace Myd.Platform
 {
     /// <summary>
     /// 特效组件

@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Myd.Platform.Demo
+namespace Myd.Platform
 {
     /// <summary>
     /// Wall Boost组件

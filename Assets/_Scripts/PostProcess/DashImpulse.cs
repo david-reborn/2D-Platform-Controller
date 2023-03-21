@@ -7,7 +7,7 @@ using UnityEngine;
 /// 
 /// </summary>
 /// 
-namespace Myd.Platform.Demo {
+namespace Myd.Platform {
     public class DashImpulse : MonoBehaviour
     {
         private CinemachineImpulseSource source;

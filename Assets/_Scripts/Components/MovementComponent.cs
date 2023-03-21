@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Myd.Platform.Demo
+namespace Myd.Platform
 {
     /// <summary>
     /// 移动组件，主要用于维护基础的运动参数，该运动参数为所有组件共用

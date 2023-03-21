@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Myd.Platform.Demo
+namespace Myd.Platform
 {
     //这里涉及坐标的数值需要/10, 除时间类型
     public static class Constants

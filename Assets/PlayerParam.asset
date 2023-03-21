@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56d3affa0ee00144187b0a6bfc9c8e50, type: 3}
+  m_Name: PlayerParam
+  m_EditorClassIdentifier: 
+  EnableWallSlide: 1
+  EnableJumpGrace: 1
+  EnableWallBoost: 1
+  MaxRun: 9
+  RunAccel: 100
+  RunReduce: 40
+  Gravity: 90
+  HalfGravThreshold: 4
+  MaxFall: -16
+  FastMaxFall: -24
+  FastMaxAccel: 30
+  JumpSpeed: 10.5
+  VarJumpTime: 0.2
+  JumpHBoost: 4
+  JumpGraceTime: 0.1
+  UpwardCornerCorrection: 4
+  DashSpeed: 24
+  EndDashSpeed: 16
+  EndDashUpMult: 0.75
+  DashTime: 0.15
+  DashCooldown: 0.2
+  DashRefillCooldown: 0.1
+  DashCornerCorrection: 4
+  MaxDashes: 1
+  ClimbCheckDist: 2
+  ClimbUpCheckDist: 2
+  ClimbNoMoveTime: 0.1
+  ClimbUpSpeed: 4.5
+  ClimbDownSpeed: -8
+  ClimbSlipSpeed: -3
+  ClimbAccel: 90
+  ClimbGrabYMult: 0.2
+  ClimbHopY: 12
+  ClimbHopX: 10
+  ClimbHopForceTime: 0.2
+  ClimbJumpBoostTime: 0.2
+  ClimbHopNoWindTime: 0.3
+  DuckFriction: 50
+  DuckSuperJumpXMult: 1.25
+  DuckSuperJumpYMult: 0.5

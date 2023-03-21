@@ -1,7 +1,7 @@
 ﻿
 using UnityEngine;
 
-namespace Myd.Platform.Demo
+namespace Myd.Platform
 {
     /// <summary>
     /// 特征参数
@@ -158,7 +158,8 @@ namespace Myd.Platform.Demo
             Constants.EnableWallSlide = this.EnableWallSlide; //启用墙壁下滑功能
             Constants.EnableJumpGrace = this.EnableJumpGrace; //土狼时间
             Constants.EnableWallBoost = this.EnableWallBoost; //WallBoost
-            this.GetComponent<Player>().RefreshAbility();
+            
+            //this.GetComponent<PlayerRenderer>().RefreshAbility();
         }
     }
 

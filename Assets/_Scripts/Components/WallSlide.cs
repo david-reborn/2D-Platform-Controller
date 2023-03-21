@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Myd.Platform.Demo
+namespace Myd.Platform
 {
     /// <summary>
     /// 沿着墙壁下滑组件
@@ -48,7 +48,7 @@ namespace Myd.Platform.Demo
         public float AdjustMaxFall(float maxFall)
         {
             float max = maxFall;
-            if ((controller.MoveX == (int)controller.Facing || (controller.MoveX == 0 && Input.Grab.Checked())) && controller.MoveY != -1)
+            if ((controller.MoveX == (int)controller.Facing || (controller.MoveX == 0 && GameInput.Grab.Checked())) && controller.MoveY != -1)
             {
                 //判断是否向下做Wall滑行
                 if (controller.Speed.y <= 0 && timer > 0 && controller.ClimbBoundsCheck((int)controller.Facing) && controller.CollideCheck(controller.Position, Vector2.right * (int)controller.Facing) && controller.CanUnDuck)
