@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Myd.Platform
 {
+
     /// <summary>
     /// Controller关于表现相关
     /// </summary>
@@ -19,6 +20,37 @@ namespace Myd.Platform
         public Color NormalHairColor = new Color32(0xAC, 0x32, 0x32, 0xFF);//00FFA2
         public Color UsedHairColor = new Color32(0x44, 0xB7, 0xFF, 0xFF);
         public Color FlashHairColor = Color.white;
+
+        public Color HairColor { get; private set; }
+
+        private float hairFlashTimer;
+        private void UpdateHair(float deltaTime)
+        {
+            if (dashes == 0 && dashes < Constants.MaxDashes)
+            {
+                HairColor = Color.Lerp(HairColor, UsedHairColor, 6f * deltaTime);
+            }
+            else
+            {
+                Color color;
+                if (lastDashes != dashes)
+                {
+                    color = FlashHairColor;
+                    hairFlashTimer = .12f;
+                }
+                else if (hairFlashTimer > 0)
+                {
+                    color = FlashHairColor;
+                    hairFlashTimer -= deltaTime;
+                }
+                else
+                    color = NormalHairColor;
+                HairColor = color;
+            }
+            SpriteControl.SetHairColor(HairColor);
+
+            lastDashes = dashes;
+        }
         ////处理缩放
         //private void UpdateSprite(float deltaTime)
         //{
@@ -30,7 +62,7 @@ namespace Myd.Platform
         //播放Dash特效
         public void PlayDashEffect(Vector3 position, Vector2 dir)
         {
-            EffectControl.DashLine(position, dir);
+            //EffectControl.DashLine(position, dir);
             EffectControl.Ripple(position);
             EffectControl.CameraShake(dir);
         }
@@ -73,7 +105,7 @@ namespace Myd.Platform
 
         public void PlayDashFluxEffect(Vector2 dir, bool enable)
         {
-            EffectControl.DashFlux(dir, enable);
+            SpriteControl.DashFlux(dir, enable);
         }
 
         public void PlayDuck(bool enable)

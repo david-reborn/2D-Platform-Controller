@@ -19,5 +19,12 @@ namespace Myd.Platform.Core
         void SetSpriteScale(Vector2 localScale);
 
         Vector3 SpritePosition { get; }
+
+        void Slash(bool enable);
+
+        void DashFlux(Vector2 dir, bool enable);
+
+        //设置头发颜色
+        void SetHairColor(Color color);
     }
 }

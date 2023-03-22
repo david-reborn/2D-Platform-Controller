@@ -21,7 +21,7 @@ namespace Myd.Platform.Core
         void JumpDust(Vector3 position);
 
         void LandDust(Vector3 position);
-
-        void DashFlux(Vector2 dir, bool enable);
+        //顿帧
+        void Freeze(float time);
     }
 }

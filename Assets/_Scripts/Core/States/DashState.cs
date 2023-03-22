@@ -12,6 +12,7 @@ namespace Myd.Platform
     {
         private Vector2 DashDir;
         private Vector2 beforeDashSpeed; 
+
         public DashState(PlayerController context) : base(EActionState.Dash, context)
         {
         }
@@ -25,6 +26,8 @@ namespace Myd.Platform
             DashDir = Vector2.zero;
             ctx.DashTrailTimer = 0;
             ctx.DashStartedOnGround = ctx.OnGround;
+            //顿帧
+            ctx.EffectControl.Freeze(0.05f);
         }
 
         public override void OnEnd()
@@ -112,10 +115,12 @@ namespace Myd.Platform
             //TODO Dash Slide
 
             ctx.PlayDashEffect(ctx.Position, dir);
-
+            ctx.SpriteControl.Slash(true);
             ctx.PlayTrailEffect((int)ctx.Facing);
             ctx.DashTrailTimer = .08f;
             yield return Constants.DashTime;
+
+            ctx.SpriteControl.Slash(false);
             ctx.PlayTrailEffect((int)ctx.Facing);
             if (this.DashDir.y >= 0)
             {

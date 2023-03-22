@@ -23,8 +23,6 @@ namespace Myd.Platform
         [SerializeField]
         private ParticleSystem vfxDashLine;
         [SerializeField]
-        private ParticleSystem vfxDashFlux;
-        [SerializeField]
         private RippleEffect vfxRippleEffect;
         [SerializeField]
         private DashImpulse vfxDashImpulse;
@@ -76,7 +74,6 @@ namespace Myd.Platform
             this.vfxJumpDust.Stop();
             this.vfxLandDust.Stop();
             this.vfxDashLine.Stop();
-            this.vfxDashFlux.Stop();
         }
 
         public void JumpDust(Vector3 position)
@@ -102,23 +99,15 @@ namespace Myd.Platform
             this.vfxDashImpulse.Shake(dir);
         }
 
+        public void Freeze(float freezeTime)
+        {
+            Game.Instance.Freeze(freezeTime);
+        }
+
         public void LandDust(Vector3 position)
         {
             this.vfxLandDust.transform.position = position;
             this.vfxLandDust.Play();
-        }
-
-        public void DashFlux(Vector2 dir, bool play)
-        {
-            if (play)
-            {
-                this.vfxDashFlux.transform.rotation = Quaternion.FromToRotation(Vector2.up, dir);
-                this.vfxDashFlux.Play();
-            }
-            else
-            {
-                this.vfxDashFlux.Stop();
-            }
         }
     }
 

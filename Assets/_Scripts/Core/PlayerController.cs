@@ -97,7 +97,7 @@ namespace Myd.Platform
         {
             //根据进入的方式,决定初始状态
             this.stateMachine.State = (int)EActionState.Normal;
-            this.dashes = 1;
+            this.lastDashes = this.dashes = 1;
             this.Position = position;
             this.collider = normalHitbox;
 
@@ -215,6 +215,7 @@ namespace Myd.Platform
             UpdateCollideX(Speed.x * deltaTime);
             UpdateCollideY(Speed.y * deltaTime);
 
+            UpdateHair(deltaTime);
         }
 
         //private Color hairColor;
