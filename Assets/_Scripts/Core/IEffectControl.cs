@@ -21,6 +21,8 @@ namespace Myd.Platform.Core
         void JumpDust(Vector3 position);
 
         void LandDust(Vector3 position);
+
+        void SpeedRing(Vector3 position, Vector2 dir);
         //顿帧
         void Freeze(float time);
     }

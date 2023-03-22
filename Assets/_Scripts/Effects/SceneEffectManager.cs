@@ -4,7 +4,7 @@ using Myd.Common;
 using Myd.Platform.Core;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 namespace Myd.Platform
 {
     /// <summary>
@@ -26,6 +26,8 @@ namespace Myd.Platform
         private RippleEffect vfxRippleEffect;
         [SerializeField]
         private DashImpulse vfxDashImpulse;
+        [SerializeField]
+        private GameObject vfxSpeedRing;
 
         public void Awake()
         {
@@ -108,6 +110,18 @@ namespace Myd.Platform
         {
             this.vfxLandDust.transform.position = position;
             this.vfxLandDust.Play();
+        }
+
+        public void SpeedRing(Vector3 position, Vector2 dir)
+        {
+            GameObject speedRing = Instantiate(vfxSpeedRing, this.transform);
+            speedRing.transform.position = position;
+            speedRing.transform.rotation = Quaternion.FromToRotation(Vector2.up, dir);
+            speedRing.transform.localScale = Vector3.zero;
+            DOTween.Sequence().Append(speedRing.transform.DOScale(Vector3.one * 1.2f, 1.5f).SetEase(DG.Tweening.Ease.OutCubic)).Join(speedRing.GetComponent<SpriteRenderer>().DOFade(0, 1.5f)).AppendCallback(() =>
+            {
+                Destroy(speedRing);
+            });
         }
     }
 

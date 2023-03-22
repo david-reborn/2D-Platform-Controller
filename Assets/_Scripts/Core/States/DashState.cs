@@ -19,6 +19,10 @@ namespace Myd.Platform
 
         public override void OnBegin()
         {
+            ctx.launched = false;
+            //顿帧
+            ctx.EffectControl.Freeze(0.05f);
+
             ctx.WallSlide?.ResetTime();
             ctx.DashCooldownTimer = Constants.DashCooldown;
             beforeDashSpeed = ctx.Speed;
@@ -26,8 +30,7 @@ namespace Myd.Platform
             DashDir = Vector2.zero;
             ctx.DashTrailTimer = 0;
             ctx.DashStartedOnGround = ctx.OnGround;
-            //顿帧
-            ctx.EffectControl.Freeze(0.05f);
+            
         }
 
         public override void OnEnd()

@@ -55,9 +55,9 @@ MonoBehaviour:
   vfxJumpDust: {fileID: 3590401226970904872}
   vfxLandDust: {fileID: 6855729331551372332}
   vfxDashLine: {fileID: 3926002619314381744}
-  vfxDashFlux: {fileID: 317195391954915939}
   vfxRippleEffect: {fileID: 2338913372475550474}
   vfxDashImpulse: {fileID: 7932017655024415880}
+  vfxSpeedRing: {fileID: 3798105973930177325, guid: 8a2504b985289e844a7867eb4904524d, type: 3}
   trailSnapshotPrefab: {fileID: 7676940193769698662, guid: 442cc696cb66b31468920a273554189b, type: 3}
 --- !u!1001 &101679385
 PrefabInstance:
@@ -399,11 +399,6 @@ PrefabInstance:
 --- !u!4 &317195391954915936 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 317195391226635516, guid: bf1436f70dfdb874390db0e420425ef8, type: 3}
-  m_PrefabInstance: {fileID: 1604941468}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &317195391954915939 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 317195391226635519, guid: bf1436f70dfdb874390db0e420425ef8, type: 3}
   m_PrefabInstance: {fileID: 1604941468}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1920088659

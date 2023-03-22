@@ -1,4 +1,5 @@
-﻿using Myd.Platform.Core;
+﻿using Myd.Common;
+using Myd.Platform.Core;
 using System;
 using UnityEngine;
 
@@ -41,6 +42,8 @@ namespace Myd.Platform
         public int HopWaitX;   // If you climb hop onto a moving solid, snap to beside it until you get above it
         public float HopWaitXSpeed;
 
+        public bool launched;
+        public float launchedTimer;
         public WallSlide WallSlide { get; set; }    //WallSlide
         public JumpCheck JumpCheck { get; set; }    //土狼时间
         public WallBoost WallBoost { get; set; }    //WallBoost
@@ -207,6 +210,32 @@ namespace Myd.Platform
                         this.HopWaitX = 0;
                     }
                 }
+
+                //Launch Particles
+                if (launched)
+                {
+                    var sq = Speed.SqrMagnitude();
+                    if (sq < Constants.LaunchedMinSpeedSq)
+                        launched = false;
+                    else
+                    {
+                        var was = launchedTimer;
+                        launchedTimer += deltaTime;
+
+                        if (launchedTimer >= .5f)
+                        {
+                            launched = false;
+                            launchedTimer = 0;
+                        }
+                        else if (Calc.OnInterval(launchedTimer, was, 0.15f))
+                        {
+                            EffectControl.SpeedRing(this.Position, this.Speed.normalized);
+                        }
+                    }
+                }
+                else
+                    launchedTimer = 0;
+
             }
 
             //状态机更新逻辑
@@ -299,8 +328,10 @@ namespace Myd.Platform
                 this.Speed.x *= Constants.DuckSuperJumpXMult;
                 this.Speed.y *= Constants.DuckSuperJumpYMult;
             }
+
             varJumpSpeed = Speed.y;
-            varJumpSpeed = Speed.y;
+            //TODO 
+            launched = true;
 
             this.PlayJumpEffect(this.SpritePosition);
         }
@@ -358,7 +389,7 @@ namespace Myd.Platform
             Speed.y = Constants.SuperWallJumpSpeed;
             //Speed += LiftBoost;
             varJumpSpeed = Speed.y;
-
+            launched = true;
             this.PlayJumpEffect(this.SpritePosition);
         }
 

@@ -103,5 +103,7 @@ namespace Myd.Platform
         #region Corner Correct
         public static int UpwardCornerCorrection = 4; //向上移动，X轴上边缘校正的最大距离
         #endregion
+
+        public static float LaunchedMinSpeedSq = 196;
     }
 }

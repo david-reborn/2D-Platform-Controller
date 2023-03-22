@@ -304,6 +304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 4509220661846234376}
   vfxDashFlux: {fileID: 4509220662029397975}
+  vfxJumpRing: {fileID: 0}
   hair: {fileID: 4509220662320803712}
   hairSprite01: {fileID: 476138251}
   hairSprite02: {fileID: 1104618344}

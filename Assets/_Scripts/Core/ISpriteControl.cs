@@ -23,7 +23,6 @@ namespace Myd.Platform.Core
         void Slash(bool enable);
 
         void DashFlux(Vector2 dir, bool enable);
-
         //设置头发颜色
         void SetHairColor(Color color);
     }
