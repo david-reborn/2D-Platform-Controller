@@ -5132,7 +5132,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0dd00436dea3ef346bf4633068d5acca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EffectRoot: {fileID: 4509220662512368594}
   EnableTrailEffect: 1
   trailEffect: {fileID: 4509220662320803713}
   HeadMount: {fileID: 4509220662379779468}

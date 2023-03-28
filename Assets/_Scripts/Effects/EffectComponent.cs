@@ -9,8 +9,6 @@ namespace Myd.Platform
     /// </summary>
     public class EffectComponent : MonoBehaviour
     {
-        [SerializeField]
-        private Transform EffectRoot;
         [Header("启用拖尾特效")]
         public bool EnableTrailEffect;
         [SerializeField]
@@ -23,16 +21,10 @@ namespace Myd.Platform
 
         private void Awake()
         {
-            
+
         }
         public void OnValidate()
         {
-            if (EffectRoot == null)
-            {
-                GameObject go = new GameObject("Effect");
-                EffectRoot = go.transform;
-                EffectRoot.SetParent(this.transform, false);
-            }
             Debug.Log("=======更新所有特效配置参数");
             trailEffect.GetComponent<TrailRenderer>().enabled = (EnableTrailEffect);
         }
