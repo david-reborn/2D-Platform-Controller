@@ -23,8 +23,9 @@ namespace Myd.Platform
             //顿帧
             ctx.EffectControl.Freeze(0.05f);
 
-            ctx.WallSlide?.ResetTime();
+            ctx.WallSlideTimer = Constants.WallSlideTime;
             ctx.DashCooldownTimer = Constants.DashCooldown;
+            ctx.DashRefillCooldownTimer = Constants.DashRefillCooldown;
             beforeDashSpeed = ctx.Speed;
             ctx.Speed = Vector2.zero;
             DashDir = Vector2.zero;
@@ -115,7 +116,6 @@ namespace Myd.Platform
                 ctx.Facing = (Facings)Math.Sign(DashDir.x);
 
             ctx.PlayDashFluxEffect(DashDir, true);
-            //TODO Dash Slide
 
             ctx.PlayDashEffect(ctx.Position, dir);
             ctx.SpriteControl.Slash(true);

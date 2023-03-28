@@ -13,26 +13,26 @@ namespace Myd.Platform
     /// 2、玩家控制器（核心控制器）
     /// 并允许两者在内部进行交互
     /// </summary>
-    public class Player : IPlayerContext
+    public class Player
     {
         private PlayerRenderer playerRenderer;
         private PlayerController playerController;
 
-        private GameScene gameScene;
+        private IGameContext gameContext;
 
-        public Player(GameScene gameScene)
+        public Player(IGameContext gameContext)
         {
-            this.gameScene = gameScene;
+            this.gameContext = gameContext;
         }
 
         //加载玩家实体
-        public void Reload()
+        public void Reload(Bounds bounds, Vector2 startPosition)
         {
             this.playerRenderer = AssetHelper.Create<PlayerRenderer>("Assets/_Prefabs/PlayerRenderer.prefab");
             this.playerRenderer.Reload();
             //初始化
-            this.playerController = new PlayerController(this, playerRenderer, SceneEffectManager.Instance);
-            this.playerController.Init(new Vector2(-36, 2));
+            this.playerController = new PlayerController(playerRenderer, gameContext.EffectControl);
+            this.playerController.Init(bounds, startPosition);
 
             PlayerParams playerParams = AssetHelper.LoadObject<PlayerParams>("Assets/PlayerParam.asset");
             playerParams.SetReloadCallback(() => this.playerController.RefreshAbility());
@@ -68,6 +68,15 @@ namespace Myd.Platform
         }
 
         private bool lastFrameOnGround;
+
+        public Vector2 GetCameraPosition()
+        {
+            if (this.playerController == null)
+            {
+                return Vector3.zero;
+            }
+            return playerController.GetCameraPosition();
+        }
     }
 
 }

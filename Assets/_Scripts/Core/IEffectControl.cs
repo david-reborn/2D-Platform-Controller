@@ -18,9 +18,9 @@ namespace Myd.Platform.Core
 
         void CameraShake(Vector2 dir);
 
-        void JumpDust(Vector3 position);
+        void JumpDust(Vector3 position, Color color, Vector2 dir);
 
-        void LandDust(Vector3 position);
+        void LandDust(Vector3 position, Color color);
 
         void SpeedRing(Vector3 position, Vector2 dir);
         //顿帧

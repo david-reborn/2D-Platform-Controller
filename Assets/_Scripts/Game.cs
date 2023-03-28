@@ -1,4 +1,7 @@
 ﻿
+using DG.Tweening;
+using Myd.Common;
+using Myd.Platform.Core;
 using System.Collections;
 using UnityEngine;
 
@@ -11,32 +14,37 @@ namespace Myd.Platform
         Pause,  //游戏暂停
         Fail,   //游戏失败
     }
-    public class Game : MonoBehaviour
+    public class Game : MonoBehaviour, IGameContext
     {
         public static Game Instance;
+
+        [SerializeField]
+        public Level level;
+        //场景特效管理器
+        [SerializeField]
+        private SceneEffectManager sceneEffectManager;
+        [SerializeField]
+        private SceneCamera gameCamera;
         //玩家
         Player player;
-        //游戏场景
-        GameScene gameScene;
 
         EGameState gameState;
 
         void Awake()
         {
             Instance = this;
+
             gameState = EGameState.Load;
 
-            gameScene = new GameScene();
-            player = new Player(gameScene);
+            player = new Player(this);
         }
 
         IEnumerator Start()
         {
-            //加载场景
-            gameScene.Reload();
             yield return null;
+
             //加载玩家
-            player.Reload();
+            player.Reload(level.Bounds, level.StartPosition);
             this.gameState = EGameState.Play;
             yield return null;
         }
@@ -51,26 +59,10 @@ namespace Myd.Platform
                     GameInput.Update(deltaTime);
                     //更新玩家逻辑数据
                     player.Update(deltaTime);
-                    //更新场景逻辑数据
-                    gameScene.Update(deltaTime);
+                    //更新摄像机
+                    gameCamera.SetCameraPosition(player.GetCameraPosition());
                 }
             }
-            //if (FreezeTimer > 0f)
-            //{
-            //    Game.FreezeTimer = Mathf.Max(Game.FreezeTimer - deltaTime, 0f);
-            //}
-            //else
-            //{
-            //    Time.timeScale = 1;
-            //    if (this.gameState == EGameState.Play)
-            //    {
-            //        GameInput.Update(deltaTime);
-            //        //更新玩家逻辑数据
-            //        player.Update(deltaTime);
-            //        //更新场景逻辑数据
-            //        gameScene.Update(deltaTime);
-            //    }
-            //}
         }
 
         #region 冻帧
@@ -105,6 +97,15 @@ namespace Myd.Platform
             }
         }
         #endregion
+        public void CameraShake(Vector2 dir, float duration)
+        {
+            this.gameCamera.Shake(dir, duration);
+        }
+
+        public IEffectControl EffectControl { get=>this.sceneEffectManager; }
+
+        public ISoundControl SoundControl { get; }
+        
     }
 
 }

@@ -8,7 +8,11 @@ using UnityEngine;
 
 namespace Myd.Platform
 {
-    public class GameScene
+    /// <summary>
+    /// 当前场景关卡
+    /// 包含当前关卡实体和特效
+    /// </summary>
+    public class GameLevelScene
     {
         //场景特效管理器
         private SceneEffectManager sceneEffectManager;

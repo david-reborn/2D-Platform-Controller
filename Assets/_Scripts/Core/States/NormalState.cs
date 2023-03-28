@@ -132,10 +132,29 @@ namespace Myd.Platform
                 {
                     float max = this.ctx.MaxFall;//最大下落速度
                     //Wall Slide
-                    if (ctx.WallSlide != null)
+                    if ((ctx.MoveX == (int)ctx.Facing || (ctx.MoveX == 0 && GameInput.Grab.Checked())) && ctx.MoveY != -1)
                     {
-                        max = ctx.WallSlide.AdjustMaxFall(max);
+                        //判断是否向下做Wall滑行
+                        if (ctx.Speed.y <= 0 && ctx.WallSlideTimer > 0 && ctx.ClimbBoundsCheck((int)ctx.Facing) && ctx.CollideCheck(ctx.Position, Vector2.right * (int)ctx.Facing) && ctx.CanUnDuck)
+                        {
+                            ctx.Ducking = false;
+                            ctx.WallSlideDir = (int)ctx.Facing;
+                        }
+
+                        if (ctx.WallSlideDir != 0)
+                        {
+                            //if (ctx.WallSlideTimer > Constants.WallSlideTime * 0.5f && ClimbBlocker.Check(level, this, Position + Vector2.UnitX * wallSlideDir))
+                            //    ctx.WallSlideTimer = Constants.WallSlideTime * .5f;
+
+                            max = Mathf.Lerp(Constants.MaxFall, Constants.WallSlideStartMax, ctx.WallSlideTimer / Constants.WallSlideTime);
+                            if ((ctx.WallSlideTimer / Constants.WallSlideTime) > .65f)
+                            {
+                                //播放滑行特效
+                                ctx.PlayWallSlideEffect(Vector2.right * ctx.WallSlideDir);
+                            }
+                        }
                     }
+
                     float mult = (Math.Abs(ctx.Speed.y) < Constants.HalfGravThreshold && (GameInput.Jump.Checked())) ? .5f : 1f;
                     //空中的情况,需要计算Y轴速度
                     ctx.Speed.y = Mathf.MoveTowards(ctx.Speed.y, max, Constants.Gravity * mult * deltaTime);
@@ -160,7 +179,8 @@ namespace Myd.Platform
                 if (this.ctx.JumpCheck.AllowJump())
                 {
                     this.ctx.Jump();
-                }else if (ctx.CanUnDuck)
+                }
+                else if (ctx.CanUnDuck)
                 {
                     //如果右侧有墙
                     if (ctx.WallJumpCheck(1))

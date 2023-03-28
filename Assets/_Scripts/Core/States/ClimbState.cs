@@ -30,7 +30,7 @@ namespace Myd.Platform
             ctx.Speed.x = 0;
             ctx.Speed.y *= Constants.ClimbGrabYMult;
             //TODO 其他参数
-            ctx.WallSlide?.ResetTime();
+            ctx.WallSlideTimer = Constants.WallSlideTime;
             ctx.WallBoost?.ResetTime();
             ctx.ClimbNoMoveTimer = Constants.ClimbNoMoveTime;
 
@@ -138,8 +138,8 @@ namespace Myd.Platform
                         }
                         else
                         {
-                            //TODO 创建粒子效果
-                            //CreateWallSlideParticles((int)Facing);
+                            //创建WallSlide粒子效果
+                            ctx.PlayWallSlideEffect(Vector2.right * (int)ctx.Facing);
                         }
                     }
                     else

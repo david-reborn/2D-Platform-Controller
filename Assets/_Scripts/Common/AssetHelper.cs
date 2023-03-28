@@ -23,6 +23,11 @@ namespace Myd.Common
             return Object.Instantiate<T>(prefab);
         }
 
+        public static Object[] LoadAllObject(string path)
+        {
+            return UnityEditor.AssetDatabase.LoadAllAssetsAtPath(path);
+        }
+
         public static void Destroy(GameObject go)
         {
             GameObject.Destroy(go);

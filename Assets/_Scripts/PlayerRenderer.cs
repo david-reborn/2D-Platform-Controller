@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Myd.Platform.Core;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +17,9 @@ namespace Myd.Platform
 
         [SerializeField]
         public ParticleSystem vfxDashFlux;
+        [SerializeField]
+        public ParticleSystem vfxWallSlide;
+
         [SerializeField]
         public TrailRenderer hair;
 
@@ -64,6 +68,14 @@ namespace Myd.Platform
 
         public void Slash(bool enable)
         {
+        }
+
+        public void WallSlide(Color color, Vector2 dir)
+        {
+            this.vfxWallSlide.transform.rotation = Quaternion.FromToRotation(Vector2.up, dir);
+            var main = this.vfxWallSlide.main;
+            main.startColor = color;
+            this.vfxWallSlide.Emit(1);
         }
 
         public void DashFlux(Vector2 dir, bool play)

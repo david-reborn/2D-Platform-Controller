@@ -1,35 +1,24 @@
-using System.Collections;
+锘縰sing System;
 using System.Collections.Generic;
 using UnityEngine;
-
-
 
 namespace Myd.Platform
 {
     public class Level : MonoBehaviour
     {
-        private Transform platformRootNode;
-        [SerializeField]
-        [Header("平台颜色组")]
-        Color[] platformColor;
+        public int levelId;
 
-        public void Awake()
-        {
-            for (int i = 0; i < this.transform.childCount; i++)
-            {
-                if (this.transform.GetChild(i).name == "Platforms")
-                {
-                    this.platformRootNode = this.transform.GetChild(i);
-                }
-            }
-        }
+        public Bounds Bounds;
 
-        void Start()
+        public Vector2 StartPosition;
+
+        public void OnDrawGizmosSelected()
         {
-            foreach(var spriteRenderer in this.platformRootNode.GetComponentsInChildren<SpriteRenderer>())
-            {
-                spriteRenderer.color = platformColor[Random.Range(0, platformColor.Length)];
-            }
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube(Bounds.center, Bounds.size);
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(StartPosition, 0.5f);
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Myd.Platform
 {
-    [CreateAssetMenu(fileName ="PlayerParam", menuName = "Pro Platformer/Player Param", order = 1 )]
+    [CreateAssetMenu(fileName = "PlayerParams", menuName = "Pro Platformer/Player Param", order = 1 )]
     public class PlayerParams : ScriptableObject
     {
         [Header("启用功能【墙壁下滑】")]

@@ -129,7 +129,6 @@ namespace Myd.Platform
         {
             return CheckGround(Vector2.zero);
         }
-
         //针对横向,进行碰撞检测.如果发生碰撞,
         private bool CheckGround(Vector2 offset)
         {

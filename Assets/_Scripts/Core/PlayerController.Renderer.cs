@@ -59,6 +59,17 @@ namespace Myd.Platform
         //    this.Scale = new Vector2(tempScaleX, tempScaleY);
         //}
 
+        public void PlayWallSlideEffect(Vector2 dir)
+        {
+            Vector2 origion = this.Position + Vector2.up * -0.5f;
+            RaycastHit2D hit = Physics2D.Raycast(origion, dir, 0.5f, GroundMask);
+            Color color = Color.white;
+            if (hit && hit.collider)
+            {
+                color = hit.collider.GetComponent<Ground>().GroundColor;
+                SpriteControl.WallSlide(color, dir);
+            }
+        }
         //播放Dash特效
         public void PlayDashEffect(Vector3 position, Vector2 dir)
         {
@@ -67,12 +78,18 @@ namespace Myd.Platform
             EffectControl.CameraShake(dir);
         }
 
-        public void PlayJumpEffect(Vector3 position)
+        public void PlayJumpEffect(Vector3 position, Vector2 forward)
         {
             SpriteControl.Scale(new Vector2(.6f, 1.4f));
 
-            EffectControl.JumpDust(position);
-            //蹬墙的粒子效果
+            Color color = Color.white;
+
+            RaycastHit2D hit = Physics2D.BoxCast(position, collider.size*0.8f, 0, -forward, 0.5f, GroundMask);
+            if (hit && hit.collider)
+            {
+                color = hit.collider.GetComponent<Ground>().GroundColor;
+                EffectControl.JumpDust(position, color, forward);
+            }
         }
 
         public void PlayTrailEffect(int face)
@@ -100,7 +117,13 @@ namespace Myd.Platform
             float scaleY = Mathf.Lerp(1, 0.4f, squish);
             SpriteControl.Scale(new Vector2(scaleX, scaleY));
 
-            EffectControl.LandDust(position);
+            RaycastHit2D hit = Physics2D.BoxCast(position, collider.size * 0.8f, 0, Vector3.down, 0.5f, GroundMask);
+            Color color = Color.white;
+            if (hit && hit.collider)
+            {
+                color = hit.collider.GetComponent<Ground>().GroundColor;
+                EffectControl.LandDust(position, color);
+            }
         }
 
         public void PlayDashFluxEffect(Vector2 dir, bool enable)
@@ -126,6 +149,8 @@ namespace Myd.Platform
         }
 
         public Vector3 SpritePosition { get => this.SpriteControl.SpritePosition; }
+        public Vector2 LeftPosition { get => this.Position + Vector2.left * 0.6f; }
+        public Vector2 RightPosition { get => this.Position + Vector2.right * 0.6f; }
     }
 
 

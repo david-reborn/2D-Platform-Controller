@@ -12,7 +12,7 @@ namespace Myd.Platform
     /// </summary>
     public class SceneEffectManager: MonoBehaviour, IEffectControl
     { 
-        public static SceneEffectManager Instance;
+        public static SceneEffectManager Instance; 
 
         [SerializeField]
         private ParticleSystem vfxMoveDust;
@@ -24,8 +24,6 @@ namespace Myd.Platform
         private ParticleSystem vfxDashLine;
         [SerializeField]
         private RippleEffect vfxRippleEffect;
-        [SerializeField]
-        private DashImpulse vfxDashImpulse;
         [SerializeField]
         private GameObject vfxSpeedRing;
 
@@ -78,9 +76,12 @@ namespace Myd.Platform
             this.vfxDashLine.Stop();
         }
 
-        public void JumpDust(Vector3 position)
+        public void JumpDust(Vector3 position, Color color, Vector2 dir)
         {
             this.vfxJumpDust.transform.position = position;
+            this.vfxJumpDust.transform.rotation = Quaternion.FromToRotation(Vector2.up, dir);
+            var main = this.vfxJumpDust.main;
+            main.startColor = color;
             this.vfxJumpDust.Play();
         }
 
@@ -98,7 +99,7 @@ namespace Myd.Platform
 
         public void CameraShake(Vector2 dir)
         {
-            this.vfxDashImpulse.Shake(dir);
+            Game.Instance.CameraShake(dir, 0.2f);
         }
 
         public void Freeze(float freezeTime)
@@ -106,9 +107,11 @@ namespace Myd.Platform
             Game.Instance.Freeze(freezeTime);
         }
 
-        public void LandDust(Vector3 position)
+        public void LandDust(Vector3 position, Color color)
         {
             this.vfxLandDust.transform.position = position;
+            var main = this.vfxLandDust.main;
+            main.startColor = color;
             this.vfxLandDust.Play();
         }
 
@@ -123,6 +126,7 @@ namespace Myd.Platform
                 Destroy(speedRing);
             });
         }
+
     }
 
 }
