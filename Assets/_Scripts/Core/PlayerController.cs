@@ -245,50 +245,6 @@ namespace Myd.Platform
             UpdateCamera(deltaTime);
         }
 
-        //private Color hairColor;
-        //private float hairFlashTimer;
-        ////Gradient gradient = new Gradient();
-        
-        //private void SetHairColor(Color color)
-        //{
-        //    Gradient gradient = new Gradient();
-        //    gradient.SetKeys(
-        //        new GradientColorKey[] { new GradientColorKey(color, 0.0f), new GradientColorKey(color, 1.0f) },
-        //        new GradientAlphaKey[] { new GradientAlphaKey(1, 0.0f), new GradientAlphaKey(1, 0.6f), new GradientAlphaKey(0, 1.0f) }
-        //    );
-        //    this.player.SetTrailColor(gradient);
-        //}
-        //private void UpdateHair(float deltaTime)
-        //{
-        //    if (this.dashes == 0 && this.dashes < MaxDashes)
-        //    {
-        //        hairColor = Color.Lerp(hairColor, UsedHairColor, 6f * deltaTime);
-        //        SetHairColor(hairColor);
-        //    }
-        //    else
-        //    {
-        //        Color color;
-        //        if (this.lastDashes != this.dashes)
-        //        {
-        //            color = FlashHairColor;
-        //            hairFlashTimer = .12f;
-        //        }
-        //        else if (hairFlashTimer > 0)
-        //        {
-        //            color = FlashHairColor;
-        //            hairFlashTimer -= deltaTime;
-        //        }
-        //        else if (this.dashes == 2)
-        //            color = Color.black;//TwoDashesHairColor;
-        //        else
-        //            color = NormalHairColor;
-
-        //        this.hairColor = color;
-        //        SetHairColor(hairColor);
-        //    }
-        //    lastDashes = dashes;
-        //}
-
         //处理跳跃,跳跃时候，会给跳跃前方一个额外的速度
         public void Jump()
         {
@@ -301,7 +257,7 @@ namespace Myd.Platform
             this.Speed.y = Constants.JumpSpeed;
             //Speed += LiftBoost;
             this.varJumpSpeed = this.Speed.y;
-
+            
             this.PlayJumpEffect(SpritePosition, Vector2.up);
         }
 
@@ -349,9 +305,9 @@ namespace Myd.Platform
                 this.ForceMoveXTimer = Constants.WallJumpForceTime;
             }
 
-            //TODO 考虑电梯对速度的加成
             Speed.x = Constants.WallJumpHSpeed * dir;
             Speed.y = Constants.JumpSpeed;
+            //TODO 考虑电梯对速度的加成
             //Speed += LiftBoost;
             varJumpSpeed = Speed.y;
 
